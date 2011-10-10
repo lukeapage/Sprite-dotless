@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spritedotless", "spritedotless\spritedotless.csproj", "{C9ED5C89-FC88-4D51-B655-034A84B29A5D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spritedotless.test", "spritedotless.test\spritedotless.test.csproj", "{CF4EB932-1FC5-4F5F-A76E-42C70DE37FAE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spritemapper", "spritemapper\spritemapper.csproj", "{4E548091-BA6A-4ED6-9BA4-B7EABE79665B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C9ED5C89-FC88-4D51-B655-034A84B29A5D}.Debug|x86.ActiveCfg = Debug|x86
+		{C9ED5C89-FC88-4D51-B655-034A84B29A5D}.Debug|x86.Build.0 = Debug|x86
+		{C9ED5C89-FC88-4D51-B655-034A84B29A5D}.Release|x86.ActiveCfg = Release|x86
+		{C9ED5C89-FC88-4D51-B655-034A84B29A5D}.Release|x86.Build.0 = Release|x86
+		{CF4EB932-1FC5-4F5F-A76E-42C70DE37FAE}.Debug|x86.ActiveCfg = Debug|x86
+		{CF4EB932-1FC5-4F5F-A76E-42C70DE37FAE}.Debug|x86.Build.0 = Debug|x86
+		{CF4EB932-1FC5-4F5F-A76E-42C70DE37FAE}.Release|x86.ActiveCfg = Release|x86
+		{CF4EB932-1FC5-4F5F-A76E-42C70DE37FAE}.Release|x86.Build.0 = Release|x86
+		{4E548091-BA6A-4ED6-9BA4-B7EABE79665B}.Debug|x86.ActiveCfg = Debug|x86
+		{4E548091-BA6A-4ED6-9BA4-B7EABE79665B}.Debug|x86.Build.0 = Debug|x86
+		{4E548091-BA6A-4ED6-9BA4-B7EABE79665B}.Release|x86.ActiveCfg = Release|x86
+		{4E548091-BA6A-4ED6-9BA4-B7EABE79665B}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
