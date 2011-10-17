@@ -43,8 +43,8 @@ namespace spritedotless.test.Tests
             });
         }
 
-                [Test]
-        public void SimpleTwoImages()
+        [Test]
+        public void SimpleTwoImagesTop()
         {
             var input = @"
 
@@ -78,17 +78,17 @@ namespace spritedotless.test.Tests
         }
 
 
-        ,
-        Right,
-        Bottom,
-        Left,
-        TopLeft,
-        TopRight,
-        BottomLeft,
-        BottomRight,
-        Vertical,
-        Horizontal,
-        Anywhere
+   
+        //Right,
+        //Bottom,
+        //Left,
+        //TopLeft,
+        //TopRight,
+        //BottomLeft,
+        //BottomRight,
+        //Vertical,
+        //Horizontal,
+        //Anywhere
 
     }
 }

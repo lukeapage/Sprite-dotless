@@ -13,6 +13,9 @@ namespace spritedotless
     /// </summary>
     public class SpriteConfig : IDisposable
     {
+        private static object s_CacheLock = new object();
+        private static Dictionary<string, SpriteList> s_Cache = null;
+
         public string ImagePath
         {
             get;
@@ -35,16 +38,33 @@ namespace spritedotless
         {
             Sprites = new Dictionary<string, SpriteList>();
             Sprites.Add(String.Empty, 
-                DefaultSprites = new SpriteList());
+                DefaultSprites = new SpriteList(String.Empty));
         }
 
-        public void Save()
+        public static void SaveSpriteList(SpriteList list, CacheLocation location)
         {
         }
 
-        public static SpriteConfig Load()
+        public static SpriteList LoadSpriteList(string groupIdentifier, CacheLocation location)
         {
-            return new SpriteConfig();
+            SpriteList spriteList = null;
+
+            if (location == CacheLocation.Memory)
+            {
+                lock (s_CacheLock)
+                {
+                    if (s_Cache != null &&
+                        s_Cache.TryGetValue(groupIdentifier, out spriteList))
+                    {
+                        return spriteList;
+                    }
+                }
+            }
+            else
+            {
+                // TODO: try to load from file
+            }
+            return null;
         }
 
         public List<string> GetImageIdentifiers()
@@ -66,6 +86,12 @@ namespace spritedotless
                 returner.Add(spritelist.Key, spritelist.Value.CreateImage());
             }
             return returner;
+        }
+
+        public enum CacheLocation
+        {
+            Memory,
+            File
         }
 
         #region IDisposable Members

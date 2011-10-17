@@ -19,7 +19,7 @@ namespace spritedotless.Functions
             string filename, spriteIdentifier;
             PositionType positionType;
 
-            CheckStdSpriteArguments(env, new int[3] {1, 2, 3}, 2, 4, _argumentList, out filename, out positionType, out spriteIdentifier);
+            CheckStdSpriteArguments(env, new int[3] {1, 2, 3}, 2, 4, _argumentList, out filename, out spriteIdentifier, out positionType);
 
             SpriteImage image = SpriteDotLessExtension.Get(env).GetSpriteImage(spriteIdentifier, positionType, filename);
 

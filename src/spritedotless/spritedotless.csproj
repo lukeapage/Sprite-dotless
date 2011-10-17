@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BinPacker.cs" />
+    <Compile Include="CacheMode.cs" />
     <Compile Include="Functions\Sprite.cs" />
     <Compile Include="Functions\SpriteFunction.cs" />
     <Compile Include="Functions\SpritePosition.cs" />

@@ -25,7 +25,7 @@ namespace spritedotless
 
             int maxHeight = 0;
             int currentX = 0;
-            foreach (SpriteImage sprite in SpriteList.Values)
+            foreach (SpriteImage sprite in SpriteList.Sprites.Values)
             {
                 maxHeight = Math.Max(maxHeight, sprite.Size.Height);
                 sprite.Position = new Point(currentX, 0);

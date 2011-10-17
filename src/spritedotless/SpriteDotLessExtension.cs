@@ -21,6 +21,7 @@ namespace spritedotless
         public SpriteDotLessExtension(IImageUrlProvider urlPovider = null)
         {
             SpriteConfig = new SpriteConfig();
+            InstanceIdentifier = String.Empty;
         }
 
         public void Setup(Env env)
@@ -50,6 +51,34 @@ namespace spritedotless
             }
         }
 
+        /// <summary>
+        ///  Sets the modus operation of the extension..
+        ///  Must be set by the creator of the extension..
+        /// </summary>
+        public CacheMode CacheMode
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        ///  A string identifying the particular sprite run - e.g. if the instance identifier is the same
+        ///  and the sprite id is the same then the caching will cache in the same place. Defaults to empty string
+        ///  which in simple cases will be fine.
+        /// </summary>
+        public string InstanceIdentifier
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        ///  Adds an image to the sprite and returns the sprite image object it has been added to
+        /// </summary>
+        /// <param name="groupIdentifier"></param>
+        /// <param name="type"></param>
+        /// <param name="filename"></param>
+        /// <returns></returns>
         public SpriteImage GetSpriteImage(string groupIdentifier, PositionType type, string filename)
         {
             if (string.IsNullOrWhiteSpace(filename)) 
@@ -74,15 +103,28 @@ namespace spritedotless
                 }
                 else
                 {
-                    spriteList = new SpriteList();
+                    switch (CacheMode)
+	                {
+                        case CacheMode.ConfigInMemoryImagesInFiles:
+                        case CacheMode.Memory:
+                            spriteList = SpriteConfig.LoadSpriteList(groupIdentifier, SpriteConfig.CacheLocation.Memory);
+                            break;
+                        case CacheMode.File:
+                            spriteList = SpriteConfig.LoadSpriteList(groupIdentifier, SpriteConfig.CacheLocation.File);
+                            break;
+	                }
+                    if (spriteList == null)
+                    {
+                        spriteList = new SpriteList(groupIdentifier);
+                    }
                     Sprites.Add(groupIdentifier, spriteList);
                 }
             }
 
 
-            if (spriteList.ContainsKey(filename))
+            if (spriteList.Sprites.ContainsKey(filename))
             {
-                return MergeImage(spriteList[filename], type);
+                return MergeImage(spriteList.Sprites[filename], type);
             }
             else
             {
@@ -103,17 +145,30 @@ namespace spritedotless
             }
             
             SpriteImage image = new SpriteImage(Path.Combine(SpriteConfig.ImagePath, filename), type, list);
-            list.Add(filename, image);
+            list.Sprites.Add(filename, image);
             return image;
+        }
+
+        private void PackBins(SpriteList spriteList)
+        {
+            if (spriteList.HasBinPacked)
+                return;
+
+            new BinPacker(spriteList).PackBins();
+        }
+
+        private string GetSpriteImageIdentifier(SpriteList spriteList)
+        {
+            // TODO belongs in config?
+            return InstanceIdentifier + (spriteList.Identifier ?? string.Empty);
         }
 
         public Point GetImagePosition(SpriteImage image)
         {
             if (!image.SpriteList.HasBinPacked)
             {
-                //TODO if loading positions, call function on spritelist to load in positions
-
-                new BinPacker(image.SpriteList).PackBins();
+                PackBins(image.SpriteList);
+                //TODO also save depending on cache mode?
             }
 
             return image.Position;

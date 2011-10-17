@@ -6,8 +6,28 @@ using System.Drawing;
 
 namespace spritedotless
 {
-    public class SpriteList : Dictionary<string, SpriteImage>, IDisposable
+    public class SpriteList : IDisposable
     {
+
+        public SpriteList(string identifier)
+        {
+            Identifier = identifier;
+        }
+
+        private Dictionary<string, SpriteImage> InternalSprites
+        {
+            get;
+            set;
+        }
+
+        public IDictionary<string, SpriteImage> Sprites
+        {
+            get
+            {
+                return InternalSprites;
+            }
+        }
+
         public bool HasBinPacked
         {
             get;
@@ -15,6 +35,12 @@ namespace spritedotless
         }
 
         public Size Dimensions
+        {
+            get;
+            set;
+        }
+
+        public string Identifier
         {
             get;
             set;
@@ -29,7 +55,7 @@ namespace spritedotless
             Bitmap bitmap = new Bitmap(Dimensions.Width, Dimensions.Height);
             Graphics g = Graphics.FromImage(bitmap);
 
-            foreach (SpriteImage spriteimage in this.Values)
+            foreach (SpriteImage spriteimage in Sprites.Values)
             {
                 spriteimage.DrawOnTo(g);
             }
@@ -41,12 +67,12 @@ namespace spritedotless
 
         public void Dispose()
         {
-            foreach (SpriteImage spriteimage in this.Values)
+            foreach (SpriteImage spriteimage in Sprites.Values)
             {
                 spriteimage.Dispose();
             }
 
-            this.Clear();
+            Sprites.Clear();
         }
 
         #endregion
