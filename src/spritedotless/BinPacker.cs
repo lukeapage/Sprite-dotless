@@ -88,7 +88,7 @@ namespace spritedotless
                 sprite.Position = new Point(candidateEmpties[0].EmptySpace.X,
                     candidateEmpties[0].EmptySpace.Y);
 
-                emptySpaces.FillUpSpace(candidateEmpties[0]);
+                emptySpaces.FillUpSpace(candidateEmpties[0], mode);
             }
 
             SpriteList.Dimensions = new Size(emptySpaces.Width, emptySpaces.Height);
@@ -154,7 +154,7 @@ namespace spritedotless
 
                 foreach (EmptySpace possibleIntersection in this)
                 {
-
+                    // top left of image inside empty space..
                     if (PointInRect(imageX, imageY, possibleIntersection.X, possibleIntersection.Y, possibleIntersection.Width, possibleIntersection.Height))
                     {
                         intersections.Add(possibleIntersection);
@@ -181,11 +181,39 @@ namespace spritedotless
                                 0, 
                                 0); }); 
 
-                        // is the entire empty space inside the image?
-                        // don't see how this can happen, but at least lets protect
-                    } else if (PointInRect(possibleIntersection.X, possibleIntersection.Y, imageX, imageY, imageWidth, imageHeight)) {
+                    } else if (possibleIntersection.X >= imageX && 
+                        possibleIntersection.X + possibleIntersection.Width <= imageX + imageWidth &&
+                        possibleIntersection.Y <= imageY &&
+                        possibleIntersection.Y + possibleIntersection.Height >= imageY + imageHeight
+                        ) {
 
                         intersections.Add(possibleIntersection);
+
+                        actions.Add(() => { 
+                            FillUpSpace(
+                                possibleIntersection, 
+                                mode, 
+                                imageWidth, 
+                                possibleIntersection.Height, 
+                                possibleIntersection.X - imageX, 
+                                0); }); 
+
+                        }
+                    else if (possibleIntersection.X <= imageX &&
+                      possibleIntersection.X + possibleIntersection.Width >= imageX + imageWidth &&
+                      possibleIntersection.Y >= imageY &&
+                      possibleIntersection.Y + possibleIntersection.Height <= imageY + imageHeight)
+                    {
+                        intersections.Add(possibleIntersection);
+
+                        actions.Add(() => { 
+                            FillUpSpace(
+                                possibleIntersection, 
+                                mode, 
+                                possibleIntersection.Width, 
+                                imageHeight, 
+                                0, 
+                                possibleIntersection.Y - imageY); }); 
                     }
                 }
 
