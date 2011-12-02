@@ -22,11 +22,18 @@ namespace spritedotless
         {
             SpriteConfig = new SpriteConfig();
             InstanceIdentifier = String.Empty;
+            UrlProvider = urlPovider;
         }
 
         public void Setup(Env env)
         {
             env.AddFunctionsFromAssembly(GetType().Assembly);
+        }
+
+        public IImageUrlProvider UrlProvider
+        {
+            get;
+            private set;
         }
 
         public SpriteConfig SpriteConfig
@@ -168,7 +175,31 @@ namespace spritedotless
             if (!image.SpriteList.HasBinPacked)
             {
                 PackBins(image.SpriteList);
-                //TODO also save depending on cache mode?
+
+                // first deal with the sprite list
+                // remember that the fact it wasn't bin packed implies
+                // that at this stage it has not been cached...
+                switch (CacheMode)
+                {
+                    case CacheMode.ConfigInMemoryImagesInFiles:
+                    case CacheMode.Memory:
+                        // save the sprite list to memory
+                        SpriteConfig.SaveSpriteList(image.SpriteList, spritedotless.SpriteConfig.CacheLocation.Memory);
+                        break;
+                    case CacheMode.File:
+                        // save the sprite list to file
+                        SpriteConfig.SaveSpriteList(image.SpriteList, spritedotless.SpriteConfig.CacheLocation.File);
+                        break;
+                    case CacheMode.None:
+                        //the image will be generated in memory specific to this sprite list
+                        //so do no cache saving
+                        break;
+                    default:
+                        throw new Exception("Unrecognised cache mode");
+                }
+
+                // deal with the actual image
+                UrlProvider.SaveImage(image.SpriteList.Identifier, CacheMode, image.SpriteList.CreateImage());
             }
 
             return image.Position;
