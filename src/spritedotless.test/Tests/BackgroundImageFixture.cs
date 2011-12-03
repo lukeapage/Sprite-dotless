@@ -24,10 +24,10 @@ namespace spritedotless.test.Tests
 ";
             var expected = @"
 .one {
-  background-position: 0px 0px;
+  background-position: -48px 0px;
 }
 .two {
-  background-position: -48px 0px;
+  background-position: 0px 0px;
 }";
             AssertLessAndPositions(input, expected, new Dictionary<string, IList<SpriteAssertion>>() { 
                 { "", new List<SpriteAssertion>() {

@@ -18,7 +18,7 @@ namespace spritedotless
             return env.GetExtension<SpriteDotLessExtension>();
         }
 
-        public SpriteDotLessExtension(IImageUrlProvider urlPovider = null)
+        public SpriteDotLessExtension(IImageUrlProvider urlPovider)
         {
             SpriteConfig = new SpriteConfig();
             InstanceIdentifier = String.Empty;

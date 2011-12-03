@@ -23,13 +23,13 @@ namespace spritedotless
         public void PackBins()
         {
             SpriteList.HasBinPacked = true;
-            BinPackingMode mode = BinPackingMode.Vertical;
+            BinPackingMode mode = BinPackingMode.Horizontal;
 
             
             int startingWidth, startingHeight;
             GetStartingWidthHeight(mode, out startingWidth, out startingHeight);
             EmptySpaces emptySpaces = new EmptySpaces(startingWidth, startingHeight);
-            List<SpriteImage> sprites = new List<SpriteImage>();
+            List<SpriteImage> sprites = new List<SpriteImage>(SpriteList.Sprites.Values);
 
             if (mode == BinPackingMode.Vertical)
             {
@@ -61,8 +61,8 @@ namespace spritedotless
 
                 if (candidateEmpties.Count == 0)
                 {
-                    emptySpaces.IncreaseSizes(lastSpace.ExcessWidth < 0 ? lastSpace.ExcessWidth : 0,
-                        lastSpace.ExcessHeight < 0 ? lastSpace.ExcessHeight : 0);
+                    emptySpaces.IncreaseSizes(emptySpaces.Width + (lastSpace.ExcessWidth < 0 ? -lastSpace.ExcessWidth : 0),
+                        emptySpaces.Height + (lastSpace.ExcessHeight < 0 ? -lastSpace.ExcessHeight : 0));
                     candidateEmpties.Add(lastSpace);
                 }
 
@@ -289,6 +289,9 @@ namespace spritedotless
 
             public void IncreaseSizes(int newWidth, int newHeight)
             {
+                Width = newWidth;
+                Height = newHeight;
+
                 foreach(EmptySpace emptySpace in this) 
                 {
                     if (emptySpace.X + emptySpace.Width == Width)
@@ -321,7 +324,7 @@ namespace spritedotless
             {
                 get
                 {
-                    return ImageWidth - EmptySpace.Width;
+                    return EmptySpace.Width - ImageWidth;
                 }
             }
 
@@ -329,7 +332,7 @@ namespace spritedotless
             {
                 get
                 {
-                    return ImageHeight - EmptySpace.Height;
+                    return EmptySpace.Height - ImageHeight;
                 }
             }
             

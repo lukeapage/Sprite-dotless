@@ -61,6 +61,7 @@
     <Compile Include="Tests\BackgroundImageFixture.cs" />
     <Compile Include="Tests\BackgroundPositionFixture.cs" />
     <Compile Include="Tests\BinPackingFixture.cs" />
+    <Compile Include="TestUrlProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

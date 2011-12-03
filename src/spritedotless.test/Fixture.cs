@@ -25,7 +25,7 @@ namespace spritedotless.test
             DefaultEnv = () =>
             {
                 var env = new Env();
-                var spriteManager = new SpriteDotLessExtension();
+                var spriteManager = new SpriteDotLessExtension(new TestUrlProvider());
                 env.AddExension(spriteManager);
                 spriteManager.SpriteConfig.ImagePath = GetTestImagePath();
                 return env;

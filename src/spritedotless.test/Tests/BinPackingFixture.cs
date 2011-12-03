@@ -31,10 +31,10 @@ namespace spritedotless.test.Tests
 ";
             var expected = @"
 .three {
-  background-position: 0px 0px;
+  background-position: -48px 0px;
 }
 .four {
-  background-position: -48px 0px;
+  background-position: 0px 0px;
 }";
             AssertLess(input, expected);
         }

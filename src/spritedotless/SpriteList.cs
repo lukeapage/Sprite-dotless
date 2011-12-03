@@ -12,6 +12,7 @@ namespace spritedotless
         public SpriteList(string identifier)
         {
             Identifier = identifier;
+            InternalSprites = new Dictionary<string, SpriteImage>();
         }
 
         private Dictionary<string, SpriteImage> InternalSprites
