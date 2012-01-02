@@ -8,6 +8,7 @@ using NUnit.Framework;
 using dotless.Test;
 using System.IO;
 using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace spritedotless.test
 {
@@ -36,6 +37,137 @@ namespace spritedotless.test
         {
             string srcDir = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName;
             return Path.Combine(srcDir, "TestImages");
+        }
+
+        protected class ImagePoint
+        {
+            public ImagePoint()
+            {
+                PositionType = spritedotless.PositionType.Anywhere;
+            }
+
+            public Point Position { get; set; }
+            public int ImageNumber { get; set; }
+            public PositionType PositionType { get; set; }
+        }
+
+        protected void DoTest(params ImagePoint[] imagePoints)
+        {
+            var input = CreateLess(imagePoints.ToArray());
+
+            var expected = CreateCSS(imagePoints.Select(a => a.Position).ToArray());
+
+            AssertLessAndPositions(input, expected, new Dictionary<string, IList<SpriteAssertion>>() { 
+                { "", CreateImageAssertions(imagePoints)
+                }
+            });
+        }
+
+        protected List<SpriteAssertion> CreateImageAssertions(params ImagePoint[] imagePoints)
+        {
+            List<SpriteAssertion> returner = new List<SpriteAssertion>();
+
+            foreach(ImagePoint imagePoint in imagePoints) 
+            {
+                returner.Add(new SpriteAssertion() {
+                    File = string.Format("test{0}.png", imagePoint.ImageNumber),
+                    Position = imagePoint.Position
+                });
+            }
+            return returner;
+        }
+
+        protected string CreateCSS(params Point[] points)
+        {
+            StringBuilder sb = new StringBuilder();
+            char cssclass = 'a';
+            foreach (Point point in points)
+            {
+                sb.Append(CreateCSSFromPosition(cssclass.ToString(), point));
+                cssclass++;
+            }
+            return sb.ToString();
+        }
+
+        protected string CreateCSSFromPosition(string className, Point position)
+        {
+            return string.Format(@"
+.{0} {{
+  background-position: {1}px {2}px;
+}}", className, -position.X, -position.Y);
+        }
+
+        protected string CreateLess(params ImagePoint[] imagePoints)
+        {
+            StringBuilder s = new StringBuilder();
+            char cssclass = 'a';
+
+            foreach (ImagePoint imagePoint in imagePoints)
+            {
+                s.AppendFormat(@"
+.{0} {{
+  background-position: SpritePosition(""test{1}.png""{2});
+}}", cssclass, imagePoint.ImageNumber, imagePoint.PositionType != PositionType.Anywhere ? ", " + imagePoint.PositionType.ToString() : "");
+                cssclass++;
+            }
+
+            return s.ToString();
+        }
+
+        private static bool _imagesGenerated = false;
+        protected readonly static Size[] TestImages = new Size[] {
+            new Size(48, 48),
+            new Size(48, 48),
+            new Size(16, 48),
+            new Size(16, 48),
+            new Size(16, 32),
+            new Size(16, 16),
+            new Size(16, 16),
+            new Size(16, 16),
+            new Size(16, 16),
+            new Size(16, 16), //10
+            new Size(16, 16),
+            new Size(16, 16),
+            new Size(16, 16),
+            new Size(16, 16),
+            new Size(32, 32) //15
+        };
+
+        [SetUp]
+        public void CreateTestImages()
+        {
+            // tests are not asyncronous so does not need to be thread safe
+            if (_imagesGenerated)
+            {
+                return;
+            }
+            _imagesGenerated = true;
+
+            Random r = new Random(301082);
+            int imageNumber = 1;
+            string directory = GetTestImagePath();
+
+            foreach (Size testImageSize in TestImages)
+            {
+                using (Bitmap testImageBitmap = new Bitmap(testImageSize.Width, testImageSize.Height))
+                {
+                    for (int x = 0; x < testImageSize.Width; x++)
+                    {
+                        for (int y = 0; y < testImageSize.Height; y++)
+                        {
+                            testImageBitmap.SetPixel(x, y, Color.FromArgb(r.Next()));
+                        }
+                    }
+
+                    using (FileStream fileStream = new FileStream(Path.Combine(directory, string.Format("test{0}.png", imageNumber)), FileMode.OpenOrCreate))
+                    {
+                        testImageBitmap.Save(fileStream, ImageFormat.Png);
+                        fileStream.Close();
+                    }
+                }
+
+                imageNumber++;
+            }
         }
 
         protected class SpriteAssertion

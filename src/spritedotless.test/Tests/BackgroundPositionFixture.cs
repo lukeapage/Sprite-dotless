@@ -14,7 +14,7 @@ namespace spritedotless.test.Tests
             var input = @"
 
 .one {
-  background-position: SpritePosition(""test1.bmp"");
+  background-position: SpritePosition(""test1.png"");
 }
 ";
             var expected = @"
@@ -30,8 +30,8 @@ namespace spritedotless.test.Tests
             var input = @"
 
 .one {
-  background-position: SpritePosition(""test1.bmp"");
-  background-position: SpritePosition(""test1.bmp"");
+  background-position: SpritePosition(""test1.png"");
+  background-position: SpritePosition(""test1.png"");
 }
 ";
             var expected = @"
@@ -48,7 +48,7 @@ namespace spritedotless.test.Tests
             var input = @"
 
 .one() {
-  background-position: SpritePosition(""test1.bmp"");
+  background-position: SpritePosition(""test1.png"");
 }
 
 .two {
@@ -70,11 +70,11 @@ namespace spritedotless.test.Tests
             var input = @"
 
 .one() {
-  background-position: SpritePosition(""test1.bmp"");
+  background-position: SpritePosition(""test1.png"");
 }
 
 .two() {
-  background-position: SpritePosition(""test1.bmp"");
+  background-position: SpritePosition(""test1.png"");
 }
 
 

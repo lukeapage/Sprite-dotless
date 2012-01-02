@@ -66,10 +66,8 @@
   <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Content Include="TestImages\test2.bmp" />
-    <Content Include="TestImages\test1.bmp" />
+    <Folder Include="TestImages\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

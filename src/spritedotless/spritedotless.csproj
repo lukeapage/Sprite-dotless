@@ -58,6 +58,7 @@
     <Compile Include="SpriteImage.cs" />
     <Compile Include="SpriteList.cs" />
     <Compile Include="SpriteDotLessExtension.cs" />
+    <Compile Include="Utilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

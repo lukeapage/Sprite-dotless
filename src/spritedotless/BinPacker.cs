@@ -29,18 +29,26 @@ namespace spritedotless
             int startingWidth, startingHeight;
             GetStartingWidthHeight(mode, out startingWidth, out startingHeight);
             EmptySpaces emptySpaces = new EmptySpaces(startingWidth, startingHeight);
-            List<SpriteImage> sprites = new List<SpriteImage>(SpriteList.Sprites.Values);
+            List<SpriteImage> spritesAnywhere = new List<SpriteImage>(SpriteList.Sprites.Values.Where(sprite => sprite.PositionType == PositionType.Anywhere));
+            List<SpriteImage> spritesInSpecificPlaces = new List<SpriteImage>(SpriteList.Sprites.Values.Where(sprite => sprite.PositionType != PositionType.Anywhere));
 
+            //spritesInSpecificPlaces.Sort((a, b) => 
+
+            foreach (SpriteImage sprite in spritesInSpecificPlaces)
+            {
+            }
+
+            // insertion sort so it is stable - helps unit tests
             if (mode == BinPackingMode.Vertical)
             {
-                sprites.Sort((a, b) => a.Size.Width < a.Size.Width ? -1 : a.Size.Width == a.Size.Width ? 0 : 1);
+                spritesAnywhere.InsertionSort((a, b) => a.Size.Width < b.Size.Width ? 1 : a.Size.Width == b.Size.Width ? 0 : -1);
             }
             else
             {
-                sprites.Sort((a, b) => a.Size.Height < a.Size.Height ? -1 : a.Size.Height == a.Size.Height ? 0 : 1);
+                spritesAnywhere.InsertionSort((a, b) => a.Size.Height < b.Size.Height ? 1 : a.Size.Height == b.Size.Height ? 0 : -1);
             }
 
-            foreach (SpriteImage sprite in sprites)
+            foreach (SpriteImage sprite in spritesAnywhere)
             {
                 List<CandidateEmpty> candidateEmpties = new List<CandidateEmpty>();
                 CandidateEmpty lastSpace = null;
@@ -101,11 +109,11 @@ namespace spritedotless
 
             foreach (SpriteImage sprite in SpriteList.Sprites.Values)
             {
-                if (mode == BinPackingMode.Horizontal)
+                if (mode == BinPackingMode.Vertical)
                 {
                     width = Math.Max(width, sprite.Size.Width);
                 }
-                if (mode == BinPackingMode.Vertical) 
+                if (mode == BinPackingMode.Horizontal) 
                 {
                     height = Math.Max(height, sprite.Size.Height);
                 }
@@ -144,7 +152,7 @@ namespace spritedotless
 
                 FillUpSpace(candidate.EmptySpace, mode, candidate.ImageWidth, candidate.ImageHeight);
 
-                                List<EmptySpace> intersections = new List<EmptySpace>();
+                List<EmptySpace> intersections = new List<EmptySpace>();
                 List<Action> actions = new List<Action>();
 
                 int imageX = candidate.EmptySpace.X,
@@ -167,8 +175,8 @@ namespace spritedotless
                                 imageHeight, 
                                 imageX - possibleIntersection.X, 
                                 imageY - possibleIntersection.Y); }); 
-
-                    } else if (PointInRect(imageX + imageWidth, imageY + imageHeight, possibleIntersection.X, possibleIntersection.Y, possibleIntersection.Width, possibleIntersection.Height)) {
+                    // bottom right
+                    } else if (PointInRect(imageX + imageWidth - 1, imageY + imageHeight - 1, possibleIntersection.X, possibleIntersection.Y, possibleIntersection.Width, possibleIntersection.Height)) {
 
                         intersections.Add(possibleIntersection);
 
@@ -181,10 +189,11 @@ namespace spritedotless
                                 0, 
                                 0); }); 
 
+                    // if the empty space is entirely inside the image
                     } else if (possibleIntersection.X >= imageX && 
-                        possibleIntersection.X + possibleIntersection.Width <= imageX + imageWidth &&
+                        possibleIntersection.X + possibleIntersection.Width < imageX + imageWidth &&
                         possibleIntersection.Y <= imageY &&
-                        possibleIntersection.Y + possibleIntersection.Height >= imageY + imageHeight
+                        possibleIntersection.Y + possibleIntersection.Height > imageY + imageHeight
                         ) {
 
                         intersections.Add(possibleIntersection);
@@ -199,6 +208,8 @@ namespace spritedotless
                                 0); }); 
 
                         }
+                    // empty space x is all outside
+                    // empty space y is inside
                     else if (possibleIntersection.X <= imageX &&
                       possibleIntersection.X + possibleIntersection.Width >= imageX + imageWidth &&
                       possibleIntersection.Y >= imageY &&
@@ -264,7 +275,7 @@ namespace spritedotless
                 int excessWidth = emptySpace.Width - (imageWidth + offsetX),
                     excessHeight = emptySpace.Height - (imageHeight + offsetY);
 
-                if (excessWidth > 0 || mode == BinPackingMode.Horizontal)
+                if (excessWidth > 0 || (mode == BinPackingMode.Horizontal && emptySpace.Y == 0))
                 {
                     Add(new EmptySpace()
                     {
@@ -275,7 +286,7 @@ namespace spritedotless
                     });
                 }
 
-                if (excessHeight > 0 || mode == BinPackingMode.Vertical)
+                if (excessHeight > 0 || (mode == BinPackingMode.Vertical && emptySpace.X == 0))
                 {
                     Add(new EmptySpace()
                     {
@@ -289,9 +300,6 @@ namespace spritedotless
 
             public void IncreaseSizes(int newWidth, int newHeight)
             {
-                Width = newWidth;
-                Height = newHeight;
-
                 foreach(EmptySpace emptySpace in this) 
                 {
                     if (emptySpace.X + emptySpace.Width == Width)
@@ -304,6 +312,9 @@ namespace spritedotless
                         emptySpace.Height += newHeight - Height;
                     }
                 }
+                Width = newWidth;
+                Height = newHeight;
+
             }
         }
 

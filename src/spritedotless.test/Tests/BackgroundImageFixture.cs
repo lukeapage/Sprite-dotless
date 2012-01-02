@@ -12,71 +12,16 @@ namespace spritedotless.test.Tests
         [Test]
         public void SimpleTwoImages()
         {
-            var input = @"
-
-.one {
-  background-position: SpritePosition(""test1.bmp"");
-}
-
-.two {
-  background-position: SpritePosition(""test2.bmp"");
-}
-";
-            var expected = @"
-.one {
-  background-position: -48px 0px;
-}
-.two {
-  background-position: 0px 0px;
-}";
-            AssertLessAndPositions(input, expected, new Dictionary<string, IList<SpriteAssertion>>() { 
-                { "", new List<SpriteAssertion>() {
-                        new SpriteAssertion() {
-                            File = "test1.bmp",
-                            Position = new Point(0, 0)
-                        },
-                        new SpriteAssertion() {
-                            File = "test2.bmp",
-                            Position = new Point(48, 0)
-                        }
-                }}
-            });
+            DoTest(new ImagePoint() { ImageNumber = 1, Position = new Point(0, 0) },
+                new ImagePoint() { ImageNumber = 2, Position = new Point(48, 0) });
         }
 
         [Test]
         public void SimpleTwoImagesTop()
         {
-            var input = @"
-
-.one {
-  background-position: SpritePosition(""test1.bmp"", Top);
-}
-
-.two {
-  background-position: SpritePosition(""test2.bmp"");
-}
-";
-            var expected = @"
-.one {
-  background-position: 0px 0px;
-}
-.two {
-  background-position: -48px 0px;
-}";
-            AssertLessAndPositions(input, expected, new Dictionary<string, IList<SpriteAssertion>>() { 
-                { "", new List<SpriteAssertion>() {
-                        new SpriteAssertion() {
-                            File = "test1.bmp",
-                            Position = new Point(0, 0)
-                        },
-                        new SpriteAssertion() {
-                            File = "test2.bmp",
-                            Position = new Point(48, 0)
-                        }
-                }}
-            });
+            DoTest(new ImagePoint() { ImageNumber = 1, Position = new Point(48, 0) },
+                new ImagePoint() { ImageNumber = 2, Position = new Point(0, 0), PositionType = PositionType.Top });
         }
-
 
    
         //Right,
