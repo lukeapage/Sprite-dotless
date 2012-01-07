@@ -120,7 +120,7 @@ namespace spritedotless.test
             new Size(48, 48),
             new Size(16, 48),
             new Size(16, 48),
-            new Size(16, 32),
+            new Size(16, 32),//5
             new Size(16, 16),
             new Size(16, 16),
             new Size(16, 16),
@@ -130,7 +130,12 @@ namespace spritedotless.test
             new Size(16, 16),
             new Size(16, 16),
             new Size(16, 16),
-            new Size(32, 32) //15
+            new Size(32, 32), //15
+            new Size(48, 16),
+            new Size(32, 16),
+            new Size(32, 16),
+            new Size(16, 64), 
+            new Size(16, 32), //20
         };
 
         [SetUp]

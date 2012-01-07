@@ -23,10 +23,32 @@ namespace spritedotless
         public void PackBins()
         {
             SpriteList.HasBinPacked = true;
-            BinPackingMode mode = BinPackingMode.Horizontal;
 
-            
+            int horizontalArea = 0, verticalArea = 0;
+            IEnumerable<Action> actionsToSetHorizontalPositions, actionsToSetVerticalPositions, actions;
+
+            actionsToSetHorizontalPositions = PackBins(BinPackingMode.Horizontal, out horizontalArea);
+            actionsToSetVerticalPositions = PackBins(BinPackingMode.Vertical, out verticalArea);
+
+            if (verticalArea < horizontalArea)
+            {
+                actions = actionsToSetVerticalPositions;
+            }
+            else
+            {
+                actions = actionsToSetHorizontalPositions;
+            }
+
+            foreach (Action action in actions)
+            {
+                action();
+            }
+        }
+
+        private IEnumerable<Action> PackBins(BinPackingMode mode, out int area)
+        {
             int startingWidth, startingHeight;
+            List<Action> actions = new List<Action>();
             GetStartingWidthHeight(mode, out startingWidth, out startingHeight);
             EmptySpaces emptySpaces = new EmptySpaces(startingWidth, startingHeight);
             List<SpriteImage> spritesAnywhere = new List<SpriteImage>(SpriteList.Sprites.Values.Where(sprite => sprite.PositionType == PositionType.Anywhere));
@@ -41,11 +63,13 @@ namespace spritedotless
             // insertion sort so it is stable - helps unit tests
             if (mode == BinPackingMode.Vertical)
             {
-                spritesAnywhere.InsertionSort((a, b) => a.Size.Width < b.Size.Width ? 1 : a.Size.Width == b.Size.Width ? 0 : -1);
+                spritesAnywhere.InsertionSort((a, b) => a.Size.Width < b.Size.Width ? 1 : a.Size.Width == b.Size.Width ? 
+                    (a.Size.Height < b.Size.Height ? 1 : a.Size.Height == b.Size.Height ? 0 : -1) : -1);
             }
             else
             {
-                spritesAnywhere.InsertionSort((a, b) => a.Size.Height < b.Size.Height ? 1 : a.Size.Height == b.Size.Height ? 0 : -1);
+                spritesAnywhere.InsertionSort((a, b) => a.Size.Height < b.Size.Height ? 1 : a.Size.Height == b.Size.Height ? 
+                    (a.Size.Width < b.Size.Width ? 1 : a.Size.Width == b.Size.Width ? 0 : -1) : -1);
             }
 
             foreach (SpriteImage sprite in spritesAnywhere)
@@ -60,8 +84,8 @@ namespace spritedotless
                         candidateEmpties.Add(candidate);
                     }
 
-                    if (lastSpace == null || (mode == BinPackingMode.Horizontal && lastSpace.EmptySpace.X < candidate.EmptySpace.X) ||
-                          (mode == BinPackingMode.Vertical && lastSpace.EmptySpace.Y < candidate.EmptySpace.Y))
+                    if (lastSpace == null || (mode == BinPackingMode.Horizontal && lastSpace.EmptySpace.X > candidate.EmptySpace.X && candidate.EmptySpace.Height >= sprite.Size.Height && (candidate.EmptySpace.X + candidate.EmptySpace.Width == emptySpaces.Width)) ||
+                          (mode == BinPackingMode.Vertical && lastSpace.EmptySpace.Y > candidate.EmptySpace.Y && candidate.EmptySpace.Width >= sprite.Size.Width) && (candidate.EmptySpace.Y + candidate.EmptySpace.Height == emptySpaces.Height))
                     {
                         lastSpace = candidate;
                     }
@@ -93,13 +117,21 @@ namespace spritedotless
                         return aN == bN ? 0 : 1;
                     });
 
-                sprite.Position = new Point(candidateEmpties[0].EmptySpace.X,
-                    candidateEmpties[0].EmptySpace.Y);
+                actions.Add(CaptureSetPosition(sprite, new Point(candidateEmpties[0].EmptySpace.X, candidateEmpties[0].EmptySpace.Y)));
 
                 emptySpaces.FillUpSpace(candidateEmpties[0], mode);
             }
 
-            SpriteList.Dimensions = new Size(emptySpaces.Width, emptySpaces.Height);
+            area = emptySpaces.Width * emptySpaces.Height;
+
+            actions.Add(() => SpriteList.Dimensions = new Size(emptySpaces.Width, emptySpaces.Height));
+
+            return actions;
+        }
+
+        private Action CaptureSetPosition(SpriteImage image, Point point)
+        {
+            return () => image.Position = point;
         }
 
         private void GetStartingWidthHeight(BinPackingMode mode, out int width, out int height)
@@ -152,7 +184,6 @@ namespace spritedotless
 
                 FillUpSpace(candidate.EmptySpace, mode, candidate.ImageWidth, candidate.ImageHeight);
 
-                List<EmptySpace> intersections = new List<EmptySpace>();
                 List<Action> actions = new List<Action>();
 
                 int imageX = candidate.EmptySpace.X,
@@ -165,29 +196,24 @@ namespace spritedotless
                     // top left of image inside empty space..
                     if (PointInRect(imageX, imageY, possibleIntersection.X, possibleIntersection.Y, possibleIntersection.Width, possibleIntersection.Height))
                     {
-                        intersections.Add(possibleIntersection);
-
-                        actions.Add(() => { 
-                            FillUpSpace(
+                        actions.Add(CapturedFillUpSpace(
                                 possibleIntersection, 
                                 mode, 
                                 imageWidth, 
                                 imageHeight, 
                                 imageX - possibleIntersection.X, 
-                                imageY - possibleIntersection.Y); }); 
+                                imageY - possibleIntersection.Y));
+ 
                     // bottom right
                     } else if (PointInRect(imageX + imageWidth - 1, imageY + imageHeight - 1, possibleIntersection.X, possibleIntersection.Y, possibleIntersection.Width, possibleIntersection.Height)) {
 
-                        intersections.Add(possibleIntersection);
-
-                        actions.Add(() => { 
-                            FillUpSpace(
+                        actions.Add(CapturedFillUpSpace(
                                 possibleIntersection, 
                                 mode, 
-                                imageWidth - (imageX - possibleIntersection.X), 
-                                imageHeight - (imageY - possibleIntersection.Y), 
-                                0, 
-                                0); }); 
+                                imageWidth - (imageX < possibleIntersection.X ? possibleIntersection.X - imageX : 0),
+                                imageHeight - (imageY < possibleIntersection.Y ? possibleIntersection.Y - imageY : 0), 
+                                imageX > possibleIntersection.X ? imageX - possibleIntersection.X : 0, 
+                                imageY > possibleIntersection.Y ? imageY - possibleIntersection.Y : 0)); 
 
                     // if the empty space is entirely inside the image
                     } else if (possibleIntersection.X >= imageX && 
@@ -196,38 +222,47 @@ namespace spritedotless
                         possibleIntersection.Y + possibleIntersection.Height > imageY + imageHeight
                         ) {
 
-                        intersections.Add(possibleIntersection);
-
-                        actions.Add(() => { 
-                            FillUpSpace(
+                        actions.Add(CapturedFillUpSpace(
                                 possibleIntersection, 
                                 mode, 
                                 imageWidth, 
                                 possibleIntersection.Height, 
                                 possibleIntersection.X - imageX, 
-                                0); }); 
+                                0)); 
 
                         }
                     // empty space x is all outside
                     // empty space y is inside
                     else if (possibleIntersection.X <= imageX &&
-                      possibleIntersection.X + possibleIntersection.Width >= imageX + imageWidth &&
+                      possibleIntersection.X + possibleIntersection.Width > imageX + imageWidth &&
                       possibleIntersection.Y >= imageY &&
-                      possibleIntersection.Y + possibleIntersection.Height <= imageY + imageHeight)
+                      possibleIntersection.Y + possibleIntersection.Height < imageY + imageHeight)
                     {
-                        intersections.Add(possibleIntersection);
-
-                        actions.Add(() => { 
-                            FillUpSpace(
+                        actions.Add(CapturedFillUpSpace(
                                 possibleIntersection, 
                                 mode, 
                                 possibleIntersection.Width, 
                                 imageHeight, 
                                 0, 
-                                possibleIntersection.Y - imageY); }); 
+                                possibleIntersection.Y - imageY)); 
                     }
                 }
 
+                // remove all the intersections
+                foreach (Action action in actions)
+                {
+                    action();
+                }
+            }
+
+            private Action CapturedFillUpSpace(EmptySpace possibleIntersection, BinPackingMode mode, int width, int height, int x, int y)
+            {
+                return () =>
+                {
+                    Remove(possibleIntersection);
+
+                    FillUpSpace(possibleIntersection, mode, width, height, x, y);
+                };
             }
 
             private bool PointInRect(int x, int y, int rx, int ry, int rw, int rh)
