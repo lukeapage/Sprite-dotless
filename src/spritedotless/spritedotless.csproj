@@ -46,7 +46,12 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BinPacker.cs" />
+    <Compile Include="BinPacker\BinPacker.cs" />
+    <Compile Include="BinPacker\BinPackingMode.cs" />
+    <Compile Include="BinPacker\CandidateEmpty.cs" />
+    <Compile Include="BinPacker\EmptySpace.cs" />
+    <Compile Include="BinPacker\EmptySpaces.cs" />
+    <Compile Include="BinPacker\PositionSetter.cs" />
     <Compile Include="CacheMode.cs" />
     <Compile Include="Functions\Sprite.cs" />
     <Compile Include="Functions\SpriteFunction.cs" />

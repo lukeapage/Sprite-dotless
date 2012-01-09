@@ -161,7 +161,7 @@ namespace spritedotless
             if (spriteList.HasBinPacked)
                 return;
 
-            new BinPacker(spriteList).PackBins();
+            new BinPacker.BinPacker(spriteList).PackBins();
         }
 
         private string GetSpriteImageIdentifier(SpriteList spriteList)

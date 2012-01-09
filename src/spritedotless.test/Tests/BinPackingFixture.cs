@@ -111,7 +111,6 @@ namespace spritedotless.test.Tests
                 new ImagePoint() { ImageNumber = 20, Position = new Point(48, 32) }, // d 16x32
                 new ImagePoint() { ImageNumber = 17, Position = new Point(64, 0) }, // e 32x16
                 new ImagePoint() { ImageNumber = 13, Position = new Point(0, 0), PositionType = PositionType.Vertical }); // f 16x16
-                
         }
 
         [Test]

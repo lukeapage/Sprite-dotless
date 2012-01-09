@@ -107,7 +107,7 @@ namespace spritedotless.test
                 s.AppendFormat(@"
 .{0} {{
   background-position: SpritePosition(""test{1}.png""{2});
-}}", cssclass, imagePoint.ImageNumber, imagePoint.PositionType != PositionType.Anywhere ? ", " + imagePoint.PositionType.ToString() : "");
+}}", cssclass, imagePoint.ImageNumber, imagePoint.PositionType != PositionType.Anywhere ? @", """", " + imagePoint.PositionType.ToString() : "");
                 cssclass++;
             }
 
