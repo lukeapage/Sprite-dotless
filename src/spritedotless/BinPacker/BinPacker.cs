@@ -216,14 +216,16 @@ namespace spritedotless.BinPacker
                 CandidateEmpty candidate = new CandidateEmpty(empty, sprite);
 
                 //if it fits its a candidate
-                if (candidate.Fits)
+                if (candidate.IsFit() && candidate.IsAppropriate())
                 {
                     candidateEmpties.Add(candidate);
                 }
 
                 //otherwise determine if its the last available space
-                if (lastSpace == null || (mode == BinPackingMode.Horizontal && lastSpace.EmptySpace.X > candidate.EmptySpace.X && candidate.EmptySpace.Height >= sprite.Size.Height && (candidate.EmptySpace.X + candidate.EmptySpace.Width == emptySpaces.Width)) ||
-                      (mode == BinPackingMode.Vertical && lastSpace.EmptySpace.Y > candidate.EmptySpace.Y && candidate.EmptySpace.Width >= sprite.Size.Width) && (candidate.EmptySpace.Y + candidate.EmptySpace.Height == emptySpaces.Height))
+                if (candidate.IsAppropriate() &&
+                    (lastSpace == null || 
+                        (mode == BinPackingMode.Horizontal && lastSpace.EmptySpace.X > candidate.EmptySpace.X && candidate.EmptySpace.Height >= sprite.Size.Height && (candidate.EmptySpace.X + candidate.EmptySpace.Width == emptySpaces.Width)) ||
+                        (mode == BinPackingMode.Vertical && lastSpace.EmptySpace.Y > candidate.EmptySpace.Y && candidate.EmptySpace.Width >= sprite.Size.Width) && (candidate.EmptySpace.Y + candidate.EmptySpace.Height == emptySpaces.Height)))
                 {
                     lastSpace = candidate;
                 }
@@ -231,6 +233,11 @@ namespace spritedotless.BinPacker
 
             if (candidateEmpties.Count == 0)
             {
+                if (lastSpace == null)
+                {
+                    throw new Exception("Shit me up charlie");
+                }
+
                 emptySpaces.IncreaseSizes(
                     RoundUpToIncrement(emptySpaces.Width + (lastSpace.ExcessWidth < 0 ? -lastSpace.ExcessWidth : 0), incrementX),
                     RoundUpToIncrement(emptySpaces.Height + (lastSpace.ExcessHeight < 0 ? -lastSpace.ExcessHeight : 0), incrementY),
@@ -259,11 +266,18 @@ namespace spritedotless.BinPacker
                 return aN == bN ? 0 : 1;
             });
 
-            PositionSetter returner = new PositionSetter()
+            PositionSetter returner = new PositionSetter(sprite, new Point(candidateEmpties[0].EmptySpace.X, candidateEmpties[0].EmptySpace.Y));
+
+            if (sprite.PositionType == PositionType.Horizontal)
             {
-                SpriteImage = sprite,
-                Position = new Point(candidateEmpties[0].EmptySpace.X, candidateEmpties[0].EmptySpace.Y)
-            };
+                returner.Size = new Size(emptySpaces.Width, returner.Size.Height);
+                candidateEmpties[0].ImageWidth = emptySpaces.Width;
+            }
+            else if (sprite.PositionType == PositionType.Vertical)
+            {
+                returner.Size = new Size(returner.Size.Width, emptySpaces.Height);
+                candidateEmpties[0].ImageHeight = emptySpaces.Height;
+            }
 
             emptySpaces.FillUpSpace(candidateEmpties[0], mode);
 

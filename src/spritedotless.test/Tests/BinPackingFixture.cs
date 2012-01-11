@@ -99,17 +99,28 @@ namespace spritedotless.test.Tests
         [Test]
         public void FillTheGaps6()
         {
-            // 
+            // Horizontal
             // 612355
             // 6123ww
             // 6124ww
             // 61w4ww
+            // 
+            // Vertical
+            // 655
+            // 612
+            // 612
+            // 612
+            // 613
+            // 643
+            // 64w
+            // 
+            // vertical = 3x7 = 21. Horizontal = 6x4 = 24
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(16, 0) }, // a 16x64
-                new ImagePoint() { ImageNumber = 3, Position = new Point(32, 0) }, // b 16x48
-                new ImagePoint() { ImageNumber = 5, Position = new Point(48, 0) }, // c 16x32
-                new ImagePoint() { ImageNumber = 20, Position = new Point(48, 32) }, // d 16x32
-                new ImagePoint() { ImageNumber = 17, Position = new Point(64, 0) }, // e 32x16
+            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(16, 16) }, // a 16x64
+                new ImagePoint() { ImageNumber = 3, Position = new Point(32, 16) }, // b 16x48
+                new ImagePoint() { ImageNumber = 5, Position = new Point(32, 64) }, // c 16x32
+                new ImagePoint() { ImageNumber = 20, Position = new Point(16, 80) }, // d 16x32
+                new ImagePoint() { ImageNumber = 17, Position = new Point(16, 0) }, // e 32x16
                 new ImagePoint() { ImageNumber = 13, Position = new Point(0, 0), PositionType = PositionType.Vertical }); // f 16x16
         }
 

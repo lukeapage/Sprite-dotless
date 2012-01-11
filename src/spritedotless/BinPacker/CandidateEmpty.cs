@@ -7,17 +7,35 @@ namespace spritedotless.BinPacker
 {
     internal class CandidateEmpty
     {
-        public bool Fits
+        public bool IsFit()
         {
-            get
-            {
-                return ExcessWidth >= 0 && ExcessHeight >= 0;
-            }
+            return ExcessWidth >= 0 && ExcessHeight >= 0;
         }
 
-        public int ImageWidth { get; private set; }
+        public bool IsAppropriate()
+        {
+            if (((PositionType & spritedotless.PositionType.Top) > 0 ||
+                PositionType == spritedotless.PositionType.Vertical) &&
+                EmptySpace.Y > 0)
+            {
+                return false;
+            }
 
-        public int ImageHeight { get; private set; }
+            if (((PositionType & spritedotless.PositionType.Left) > 0 ||
+                PositionType == spritedotless.PositionType.Horizontal) &&
+                EmptySpace.X > 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public int ImageWidth { get; set; }
+
+        public int ImageHeight { get; set; }
+
+        public PositionType PositionType { get; private set; }
 
         public int ExcessWidth
         {
@@ -41,6 +59,7 @@ namespace spritedotless.BinPacker
         {
             ImageWidth = image.Size.Width;
             ImageHeight = image.Size.Height;
+            PositionType = image.PositionType;
             EmptySpace = emptySpace;
         }
     }

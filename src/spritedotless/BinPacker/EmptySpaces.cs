@@ -22,7 +22,7 @@ namespace spritedotless.BinPacker
         {
             Remove(candidate.EmptySpace);
 
-            FillUpSpace(candidate.EmptySpace, mode, candidate.ImageWidth, candidate.ImageHeight);
+            FillUpSpace(candidate.EmptySpace, mode, candidate.PositionType, candidate.ImageWidth, candidate.ImageHeight);
 
             List<Action> actions = new List<Action>();
 
@@ -39,6 +39,7 @@ namespace spritedotless.BinPacker
                     actions.Add(CapturedFillUpSpace(
                             possibleIntersection,
                             mode,
+                            candidate.PositionType,
                             imageWidth,
                             imageHeight,
                             imageX - possibleIntersection.X,
@@ -52,6 +53,7 @@ namespace spritedotless.BinPacker
                     actions.Add(CapturedFillUpSpace(
                             possibleIntersection,
                             mode,
+                            candidate.PositionType,
                             imageWidth - (imageX < possibleIntersection.X ? possibleIntersection.X - imageX : 0),
                             imageHeight - (imageY < possibleIntersection.Y ? possibleIntersection.Y - imageY : 0),
                             imageX > possibleIntersection.X ? imageX - possibleIntersection.X : 0,
@@ -69,6 +71,7 @@ namespace spritedotless.BinPacker
                     actions.Add(CapturedFillUpSpace(
                             possibleIntersection,
                             mode,
+                            candidate.PositionType,
                             imageWidth,
                             possibleIntersection.Height,
                             possibleIntersection.X - imageX,
@@ -85,6 +88,7 @@ namespace spritedotless.BinPacker
                     actions.Add(CapturedFillUpSpace(
                             possibleIntersection,
                             mode,
+                            candidate.PositionType,
                             possibleIntersection.Width,
                             imageHeight,
                             0,
@@ -99,13 +103,13 @@ namespace spritedotless.BinPacker
             }
         }
 
-        private Action CapturedFillUpSpace(EmptySpace possibleIntersection, BinPackingMode mode, int width, int height, int x, int y)
+        private Action CapturedFillUpSpace(EmptySpace possibleIntersection, BinPackingMode mode, PositionType positionType, int width, int height, int x, int y)
         {
             return () =>
             {
                 Remove(possibleIntersection);
 
-                FillUpSpace(possibleIntersection, mode, width, height, x, y);
+                FillUpSpace(possibleIntersection, mode, positionType, width, height, x, y);
             };
         }
 
@@ -116,7 +120,7 @@ namespace spritedotless.BinPacker
                     ry + rh >= y;
         }
 
-        private void FillUpSpace(EmptySpace emptySpace, BinPackingMode mode, int imageWidth, int imageHeight, int offsetX = 0, int offsetY = 0)
+        private void FillUpSpace(EmptySpace emptySpace, BinPackingMode mode, PositionType positionType, int imageWidth, int imageHeight, int offsetX = 0, int offsetY = 0)
         {
             // image might be spanned across empty spaces.. for our purposes make sure we only consider the bit in this space
             if (imageWidth + offsetX > emptySpace.Width)
@@ -154,26 +158,32 @@ namespace spritedotless.BinPacker
             int excessWidth = emptySpace.Width - (imageWidth + offsetX),
                 excessHeight = emptySpace.Height - (imageHeight + offsetY);
 
-            if (excessWidth > 0 || (mode == BinPackingMode.Horizontal && emptySpace.Y == 0))
+            if (excessWidth > 0 || (mode == BinPackingMode.Horizontal && (emptySpace.X + emptySpace.Width == this.Width)))
             {
-                Add(new EmptySpace()
+                if (positionType != PositionType.Horizontal)
                 {
-                    X = emptySpace.X + imageWidth + offsetX,
-                    Y = emptySpace.Y,
-                    Width = excessWidth,
-                    Height = emptySpace.Height
-                });
+                    Add(new EmptySpace()
+                    {
+                        X = emptySpace.X + imageWidth + offsetX,
+                        Y = emptySpace.Y,
+                        Width = excessWidth,
+                        Height = emptySpace.Height
+                    });
+                }
             }
 
-            if (excessHeight > 0 || (mode == BinPackingMode.Vertical && emptySpace.X == 0))
+            if (excessHeight > 0 || (mode == BinPackingMode.Vertical && (emptySpace.Y + emptySpace.Height == this.Height)))
             {
-                Add(new EmptySpace()
+                if (positionType != PositionType.Vertical)
                 {
-                    X = emptySpace.X,
-                    Y = emptySpace.Y + imageHeight + offsetY,
-                    Width = emptySpace.Width,
-                    Height = excessHeight
-                });
+                    Add(new EmptySpace()
+                    {
+                        X = emptySpace.X,
+                        Y = emptySpace.Y + imageHeight + offsetY,
+                        Width = emptySpace.Width,
+                        Height = excessHeight
+                    });
+                }
             }
         }
 
@@ -189,6 +199,13 @@ namespace spritedotless.BinPacker
                     emptySpace.Width += increaseX;
                 }
 
+                foreach (PositionSetter posSetter in positionDecidedImages.Where(
+                    (positionDecidedImage) => positionDecidedImage.SpriteImage.PositionType == PositionType.Horizontal))
+                {
+                    posSetter.Size = new Size(posSetter.Size.Width + increaseX, posSetter.Size.Height);
+                }
+
+                // purposefully excludes horizontal and vertical positioned sprites
                 foreach (PositionSetter posSetter in positionDecidedImages.Where(
                     (positionDecidedImage) => (positionDecidedImage.SpriteImage.PositionType & PositionType.Right) > 0))
                 {
@@ -213,6 +230,13 @@ namespace spritedotless.BinPacker
                 }
 
                 foreach (PositionSetter posSetter in positionDecidedImages.Where(
+                    (positionDecidedImage) => positionDecidedImage.SpriteImage.PositionType == PositionType.Vertical))
+                {
+                    posSetter.Size = new Size(posSetter.Size.Width, posSetter.Size.Height + increaseY);
+                }
+
+                // purposefully excludes horizontal and vertical positioned sprites
+                foreach (PositionSetter posSetter in positionDecidedImages.Where(
                     (positionDecidedImage) => (positionDecidedImage.SpriteImage.PositionType & PositionType.Bottom) > 0))
                 {
                     // since the empty we are looking for "maps" on to the filled image, we only have to check if the empty
@@ -228,19 +252,6 @@ namespace spritedotless.BinPacker
                 }
             }
 
-
-            foreach (EmptySpace emptySpace in this)
-            {
-                if (emptySpace.X + emptySpace.Width == Width)
-                {
-                    emptySpace.Width += increaseX;
-                }
-
-                if (emptySpace.Y + emptySpace.Height == Height)
-                {
-                    emptySpace.Height += increaseY;
-                }
-            }
             Width = newWidth;
             Height = newHeight;
         }
