@@ -12,7 +12,7 @@ namespace spritedotless.BinPacker
             return ExcessWidth >= 0 && ExcessHeight >= 0;
         }
 
-        public bool IsAppropriate()
+        public bool IsAppropriate(int width, int height)
         {
             if (((PositionType & spritedotless.PositionType.Top) > 0 ||
                 PositionType == spritedotless.PositionType.Vertical) &&
@@ -24,6 +24,18 @@ namespace spritedotless.BinPacker
             if (((PositionType & spritedotless.PositionType.Left) > 0 ||
                 PositionType == spritedotless.PositionType.Horizontal) &&
                 EmptySpace.X > 0)
+            {
+                return false;
+            }
+
+            if (((PositionType & spritedotless.PositionType.Bottom) > 0) &&
+                EmptySpace.Y  + EmptySpace.Height < height)
+            {
+                return false;
+            }
+
+            if (((PositionType & spritedotless.PositionType.Right) > 0) &&
+                EmptySpace.X + EmptySpace.Width < width)
             {
                 return false;
             }

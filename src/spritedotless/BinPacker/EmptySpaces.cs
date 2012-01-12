@@ -18,16 +18,16 @@ namespace spritedotless.BinPacker
             Add(new EmptySpace() { X = 0, Y = 0, Width = Width, Height = Height });
         }
 
-        public void FillUpSpace(CandidateEmpty candidate, BinPackingMode mode)
+        public void FillUpSpace(CandidateEmpty candidate, BinPackingMode mode, int offsetX, int offsetY)
         {
             Remove(candidate.EmptySpace);
 
-            FillUpSpace(candidate.EmptySpace, mode, candidate.PositionType, candidate.ImageWidth, candidate.ImageHeight);
+            FillUpSpace(candidate.EmptySpace, mode, candidate.PositionType, candidate.ImageWidth, candidate.ImageHeight, offsetX, offsetY);
 
             List<Action> actions = new List<Action>();
 
-            int imageX = candidate.EmptySpace.X,
-                imageY = candidate.EmptySpace.Y,
+            int imageX = candidate.EmptySpace.X + offsetX,
+                imageY = candidate.EmptySpace.Y + offsetY,
                 imageWidth = candidate.ImageWidth,
                 imageHeight = candidate.ImageHeight;
 
@@ -115,9 +115,16 @@ namespace spritedotless.BinPacker
 
         private bool PointInRect(int x, int y, int rx, int ry, int rw, int rh)
         {
+            //
+            // Zxx
+            // xxx
+            // xxY
+            //
+            // case 1 Z = 0,0, rx,ry = 0,0, rw,rh = 3,3
+            // case 2 Y = 2,2
             return rx <= x && ry <= y &&
-                    rx + rw >= x &&
-                    ry + rh >= y;
+                    rx + rw > x &&
+                    ry + rh > y;
         }
 
         private void FillUpSpace(EmptySpace emptySpace, BinPackingMode mode, PositionType positionType, int imageWidth, int imageHeight, int offsetX = 0, int offsetY = 0)
@@ -160,7 +167,19 @@ namespace spritedotless.BinPacker
 
             if (excessWidth > 0 || (mode == BinPackingMode.Horizontal && (emptySpace.X + emptySpace.Width == this.Width)))
             {
-                if (positionType != PositionType.Horizontal)
+                if ((positionType & PositionType.Right) > 0 && mode == BinPackingMode.Horizontal)
+                {
+                    if (offsetX == 0)
+                    {
+                        Add(new EmptySpace()
+                        {
+                            X = emptySpace.X,
+                            Y = emptySpace.Y,
+                            Width = 0,
+                            Height = emptySpace.Height
+                        });
+                    }
+                } else if (positionType != PositionType.Horizontal)
                 {
                     Add(new EmptySpace()
                     {
@@ -174,7 +193,19 @@ namespace spritedotless.BinPacker
 
             if (excessHeight > 0 || (mode == BinPackingMode.Vertical && (emptySpace.Y + emptySpace.Height == this.Height)))
             {
-                if (positionType != PositionType.Vertical)
+                if ((positionType & PositionType.Bottom) > 0 && mode == BinPackingMode.Vertical)
+                {
+                    if (offsetY == 0)
+                    {
+                        Add(new EmptySpace()
+                        {
+                            X = emptySpace.X,
+                            Y = emptySpace.Y,
+                            Width = emptySpace.Width,
+                            Height = 0
+                        });
+                    }
+                } else if (positionType != PositionType.Vertical)
                 {
                     Add(new EmptySpace()
                     {

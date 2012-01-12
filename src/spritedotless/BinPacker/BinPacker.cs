@@ -34,6 +34,19 @@ namespace spritedotless.BinPacker
             actionToSetHorizontalPositions = PackBins(BinPackingMode.Horizontal, out horizontalArea);
             actionToSetVerticalPositions = PackBins(BinPackingMode.Vertical, out verticalArea);
 
+            if (verticalArea == horizontalArea)
+            {
+                // if it contains a horizontal sprite we want to favour vertical - more whitespace
+                if (SpriteList.Sprites.Values.FirstOrDefault((sprite) => sprite.PositionType == PositionType.Horizontal) != null)
+                {
+                    horizontalArea++;
+                }
+                else
+                {
+                    verticalArea++;
+                }
+            }
+
             // choose the best
             action = (verticalArea < horizontalArea) ?
                 actionToSetVerticalPositions :
@@ -216,13 +229,13 @@ namespace spritedotless.BinPacker
                 CandidateEmpty candidate = new CandidateEmpty(empty, sprite);
 
                 //if it fits its a candidate
-                if (candidate.IsFit() && candidate.IsAppropriate())
+                if (candidate.IsFit() && candidate.IsAppropriate(emptySpaces.Width, emptySpaces.Height))
                 {
                     candidateEmpties.Add(candidate);
                 }
 
                 //otherwise determine if its the last available space
-                if (candidate.IsAppropriate() &&
+                if (candidate.IsAppropriate(emptySpaces.Width, emptySpaces.Height) &&
                     (lastSpace == null || 
                         (mode == BinPackingMode.Horizontal && lastSpace.EmptySpace.X > candidate.EmptySpace.X && candidate.EmptySpace.Height >= sprite.Size.Height && (candidate.EmptySpace.X + candidate.EmptySpace.Width == emptySpaces.Width)) ||
                         (mode == BinPackingMode.Vertical && lastSpace.EmptySpace.Y > candidate.EmptySpace.Y && candidate.EmptySpace.Width >= sprite.Size.Width) && (candidate.EmptySpace.Y + candidate.EmptySpace.Height == emptySpaces.Height)))
@@ -266,20 +279,33 @@ namespace spritedotless.BinPacker
                 return aN == bN ? 0 : 1;
             });
 
-            PositionSetter returner = new PositionSetter(sprite, new Point(candidateEmpties[0].EmptySpace.X, candidateEmpties[0].EmptySpace.Y));
+            int offsetX = 0, offsetY = 0;
+            Size size = sprite.Size;
 
             if (sprite.PositionType == PositionType.Horizontal)
             {
-                returner.Size = new Size(emptySpaces.Width, returner.Size.Height);
+                size = new Size(emptySpaces.Width, size.Height);
                 candidateEmpties[0].ImageWidth = emptySpaces.Width;
             }
             else if (sprite.PositionType == PositionType.Vertical)
             {
-                returner.Size = new Size(returner.Size.Width, emptySpaces.Height);
+                size = new Size(size.Width, emptySpaces.Height);
                 candidateEmpties[0].ImageHeight = emptySpaces.Height;
             }
+            
+            if ((sprite.PositionType & PositionType.Bottom) > 0)
+            {
+                offsetY = candidateEmpties[0].ExcessHeight;
+            }
 
-            emptySpaces.FillUpSpace(candidateEmpties[0], mode);
+            if ((sprite.PositionType & PositionType.Right) > 0)
+            {
+                offsetX = candidateEmpties[0].ExcessWidth;
+            }
+
+            PositionSetter returner = new PositionSetter(sprite, new Point(candidateEmpties[0].EmptySpace.X + offsetX, candidateEmpties[0].EmptySpace.Y + offsetY), size);
+
+            emptySpaces.FillUpSpace(candidateEmpties[0], mode, offsetX, offsetY);
 
             return returner;
         }

@@ -97,7 +97,28 @@ namespace spritedotless.test.Tests
         }
 
         [Test]
-        public void FillTheGaps6()
+        public void FillTheGaps6VerticalIsOptimal1()
+        {
+            // same as above but without a way to force horizontal
+            // and below vertical
+            // 55
+            // 12
+            // 12
+            // 12
+            // 13
+            // 43
+            // 4w
+
+            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 16) }, // a 16x64
+                new ImagePoint() { ImageNumber = 3, Position = new Point(16, 16) }, // b 16x48
+                new ImagePoint() { ImageNumber = 5, Position = new Point(16, 64) }, // c 16x32
+                new ImagePoint() { ImageNumber = 20, Position = new Point(0, 80) }, // d 16x32
+                new ImagePoint() { ImageNumber = 17, Position = new Point(0, 0) }); // e 32x16
+                
+        }
+
+        [Test]
+        public void FillTheGaps6VerticalIsOptimal2()
         {
             // Horizontal
             // 612355
@@ -125,25 +146,98 @@ namespace spritedotless.test.Tests
         }
 
         [Test]
-        public void FillTheGaps6VerticalIsOptimal()
+        public void FillTheGaps6HorizontalIsOptimal1()
         {
-            // same as above but without a way to force horizontal
-            // and below vertical
-            // 55
-            // 12
-            // 12
-            // 12
-            // 13
-            // 43
-            // 4w
+            // Horizontal (units of 9 because of vertical strip)
+            // 612w
+            // 612w
+            // 612w
+            // 613w
+            // 643w
+            // 6455
+            // 
+            // Vertical
+            // 655
+            // 612
+            // 612
+            // 612
+            // 613
+            // 643
+            // 64w
+            // 6ww
+            // 6ww
+            //
+            // vertical = 3x9 = 27. Horizontal = 6x4 = 24
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 16) }, // a 16x64
-                new ImagePoint() { ImageNumber = 3, Position = new Point(16, 16) }, // b 16x48
-                new ImagePoint() { ImageNumber = 5, Position = new Point(16, 64) }, // c 16x32
-                new ImagePoint() { ImageNumber = 20, Position = new Point(0, 80) }, // d 16x32
-                new ImagePoint() { ImageNumber = 17, Position = new Point(0, 0) }); // e 32x16
-                
+            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(16, 0) }, // a 16x64
+                new ImagePoint() { ImageNumber = 3, Position = new Point(32, 0) }, // b 16x48
+                new ImagePoint() { ImageNumber = 5, Position = new Point(32, 48) }, // c 16x32
+                new ImagePoint() { ImageNumber = 20, Position = new Point(16, 64) }, // d 16x32
+                new ImagePoint() { ImageNumber = 17, Position = new Point(32, 80) }, // e 32x16
+                new ImagePoint() { ImageNumber = 4, Position = new Point(0, 0), PositionType = PositionType.Vertical }); // f 16x48
         }
+
+        [Test]
+        public void FillTheGaps6HorizontalIsOptimal2()
+        {
+            // Horizontal (units of 9 because of vertical strip)
+            // 612355
+            // 6123ww
+            // 6124ww
+            // 61w4ww
+            //  
+            // Vertical
+            // 655
+            // 612
+            // 612
+            // 612
+            // 613
+            // 643
+            // 64w
+            // 6ww
+            //
+            // vertical = 3x8 = 24. Horizontal = 6x4 = 24
+
+            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(16, 0) }, // a 16x64
+                new ImagePoint() { ImageNumber = 3, Position = new Point(32, 0) }, // b 16x48
+                new ImagePoint() { ImageNumber = 5, Position = new Point(48, 0) }, // c 16x32
+                new ImagePoint() { ImageNumber = 20, Position = new Point(48, 32) }, // d 16x32
+                new ImagePoint() { ImageNumber = 17, Position = new Point(64, 0) }, // e 32x16
+                new ImagePoint() { ImageNumber = 22, Position = new Point(0, 0), PositionType = PositionType.Vertical }); // f 16x64
+        }
+
+        [Test]
+        public void FillTheGaps6HorizontalIsOptimal3()
+        {
+            // Horizontal
+            // 6124w
+            // 6124w
+            // 612ww
+            // 61355
+            // 6w3ww 
+            //
+            // Vertical
+            // 655
+            // 612
+            // 612
+            // 612
+            // 613
+            // 643
+            // 64w
+            // 6ww
+            // 6ww
+            // 6ww
+            //
+            // vertical = 3x10 = 30. Horizontal = 5x5 = 25
+
+            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(16, 0) }, // a 16x64
+                new ImagePoint() { ImageNumber = 3, Position = new Point(32, 0) }, // b 16x48
+                new ImagePoint() { ImageNumber = 5, Position = new Point(32, 48) }, // c 16x32
+                new ImagePoint() { ImageNumber = 20, Position = new Point(48, 0) }, // d 16x32
+                new ImagePoint() { ImageNumber = 17, Position = new Point(48, 48) }, // e 32x16
+                new ImagePoint() { ImageNumber = 21, Position = new Point(0, 0), PositionType = PositionType.Vertical }); // f 16x80
+        }
+
 
         [Test]
         public void FillTheGaps7()

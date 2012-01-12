@@ -15,10 +15,10 @@ namespace spritedotless.BinPacker
         public Point Position { get; set; }
         public Size Size { get; set; }
 
-        public PositionSetter(SpriteImage spriteImage, Point position)
+        public PositionSetter(SpriteImage spriteImage, Point position, Size size)
         {
             SpriteImage = spriteImage;
-            Size = spriteImage.Size;
+            Size = size;
             Position = position;
         }
 
