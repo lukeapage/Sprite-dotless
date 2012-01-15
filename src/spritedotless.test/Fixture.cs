@@ -138,6 +138,8 @@ namespace spritedotless.test
             new Size(16, 32), //20
             new Size(16, 80),
             new Size(16, 64),
+            new Size(80, 16),
+            new Size(48, 32),
         };
 
         [SetUp]

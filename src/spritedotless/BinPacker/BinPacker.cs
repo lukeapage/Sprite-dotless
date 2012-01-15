@@ -190,25 +190,25 @@ namespace spritedotless.BinPacker
             switch (type)
             {
                 case PositionType.TopLeft:
-                    return 1;
-                case PositionType.TopRight:
-                    return 2;
-                case PositionType.BottomLeft:
-                    return 3;
-                case PositionType.BottomRight:
-                    return 4;
-                case PositionType.Vertical:
-                    return 5;
-                case PositionType.Horizontal:
-                    return 6;
-                case PositionType.Top:
-                    return 7;
-                case PositionType.Left:
-                    return 8;
-                case PositionType.Bottom:
-                    return 9;
-                case PositionType.Right:
                     return 10;
+                case PositionType.TopRight:
+                    return 9;
+                case PositionType.BottomLeft:
+                    return 8;
+                case PositionType.BottomRight:
+                    return 7;
+                case PositionType.Vertical:
+                    return 6;
+                case PositionType.Horizontal:
+                    return 5;
+                case PositionType.Top:
+                    return 4;
+                case PositionType.Left:
+                    return 3;
+                case PositionType.Bottom:
+                    return 2;
+                case PositionType.Right:
+                    return 1;
                 default:
                     return 0;
             }
@@ -248,7 +248,7 @@ namespace spritedotless.BinPacker
             {
                 if (lastSpace == null)
                 {
-                    throw new Exception("Shit me up charlie");
+                    throw new Exception("Cannot find any available space for sprite.");
                 }
 
                 emptySpaces.IncreaseSizes(
@@ -345,15 +345,6 @@ namespace spritedotless.BinPacker
 
             foreach (SpriteImage sprite in SpriteList.Sprites.Values)
             {
-                if (mode == BinPackingMode.Vertical)
-                {
-                    width = Math.Max(width, sprite.Size.Width);
-                }
-                if (mode == BinPackingMode.Horizontal) 
-                {
-                    height = Math.Max(height, sprite.Size.Height);
-                }
-
                 switch (sprite.PositionType)
                 {
                     case PositionType.Top:
@@ -408,11 +399,24 @@ namespace spritedotless.BinPacker
                         heightNeededLeft += sprite.Size.Height;
                         heightNeededRight += sprite.Size.Height;
                         break;
+                    case PositionType.Anywhere:
+                        if (mode == BinPackingMode.Vertical)
+                        {
+                            width = Math.Max(width, sprite.Size.Width);
+                        }
+                        if (mode == BinPackingMode.Horizontal) 
+                        {
+                            height = Math.Max(height, sprite.Size.Height);
+                        }
+                        break;
                 }
             }
 
-            width += widthNeededLeft + widthNeededRight;
-            height += heightNeededTop + heightNeededBottom;
+            //width += widthNeededLeft + widthNeededRight;
+            //height += heightNeededTop + heightNeededBottom;
+
+            width = Math.Max(Math.Max(width, widthNeededLeft), widthNeededRight);
+            height = Math.Max(Math.Max(height, heightNeededTop), heightNeededBottom);
 
             width = Math.Max(Math.Max(width, widthNeededTop), widthNeededBottom);
             height = Math.Max(Math.Max(height, heightNeededLeft), heightNeededRight);

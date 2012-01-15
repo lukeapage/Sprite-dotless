@@ -59,7 +59,7 @@ namespace spritedotless.BinPacker
                             imageX > possibleIntersection.X ? imageX - possibleIntersection.X : 0,
                             imageY > possibleIntersection.Y ? imageY - possibleIntersection.Y : 0));
 
-                    // if the empty space is entirely inside the image
+                    // if the empty space width is entirely inside the image
                 }
                 else if (possibleIntersection.X >= imageX &&
                   possibleIntersection.X + possibleIntersection.Width < imageX + imageWidth &&
@@ -72,10 +72,10 @@ namespace spritedotless.BinPacker
                             possibleIntersection,
                             mode,
                             candidate.PositionType,
-                            imageWidth,
-                            possibleIntersection.Height,
-                            possibleIntersection.X - imageX,
-                            0));
+                            possibleIntersection.Width,
+                            imageHeight,
+                            0, //possibleIntersection.X - imageX,
+                            imageY - possibleIntersection.Y));
 
                 }
                 // empty space x is all outside
@@ -89,10 +89,10 @@ namespace spritedotless.BinPacker
                             possibleIntersection,
                             mode,
                             candidate.PositionType,
-                            possibleIntersection.Width,
-                            imageHeight,
-                            0,
-                            possibleIntersection.Y - imageY));
+                            imageWidth,
+                            possibleIntersection.Height,
+                            imageX - possibleIntersection.X,
+                            0));
                 }
             }
 
