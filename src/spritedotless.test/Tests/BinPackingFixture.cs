@@ -407,6 +407,145 @@ namespace spritedotless.test.Tests
                 new ImagePoint() { ImageNumber = 6, Position = new Point(48, 112) }); // e 16x16 
         }
 
+        [Test]
+        public void RoundTheTableLeftPushedOff()
+        {
+            // 1555 4
+            // 1    6
+            // 1
+            // 1
+            // 888888
+            // 2        -80
+            // 2    3   -96
+            // 277  3   -112
+            //          -128
+            //          -144
+
+            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+                new ImagePoint() { ImageNumber = 3, Position = new Point(0, 80), PositionType = PositionType.BottomLeft }, // b 16x48
+                new ImagePoint() { ImageNumber = 5, Position = new Point(80, 96), PositionType = PositionType.BottomRight }, // c 16x32
+                new ImagePoint() { ImageNumber = 13, Position = new Point(80, 0), PositionType = PositionType.TopRight }, //d 16x16
+                new ImagePoint() { ImageNumber = 16, Position = new Point(16, 0), PositionType = PositionType.Top }, // e 48x16
+                new ImagePoint() { ImageNumber = 14, Position = new Point(80, 16), PositionType = PositionType.Right }, //f 16x16
+                new ImagePoint() { ImageNumber = 17, Position = new Point(16, 112), PositionType = PositionType.Bottom }, // g 32x16 
+                new ImagePoint() { ImageNumber = 27, Position = new Point(0, 64), PositionType = PositionType.Left }); // h 96x16 
+        }
+
+        [Test]
+        public void RoundTheTableRightPushedOff()
+        {
+            // 1555  4
+            // 1888888     
+            // 1     6
+            // 1
+            // 2
+            // 2     3   -80
+            // 277   3   -96
+            //           -112
+            //           -128
+            //           -144
+
+            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+                new ImagePoint() { ImageNumber = 3, Position = new Point(0, 64), PositionType = PositionType.BottomLeft }, // b 16x48
+                new ImagePoint() { ImageNumber = 5, Position = new Point(96, 80), PositionType = PositionType.BottomRight }, // c 16x32
+                new ImagePoint() { ImageNumber = 13, Position = new Point(96, 0), PositionType = PositionType.TopRight }, //d 16x16
+                new ImagePoint() { ImageNumber = 16, Position = new Point(16, 0), PositionType = PositionType.Top }, // e 48x16
+                new ImagePoint() { ImageNumber = 14, Position = new Point(96, 32), PositionType = PositionType.Right }, //f 16x16
+                new ImagePoint() { ImageNumber = 17, Position = new Point(16, 96), PositionType = PositionType.Bottom }, // g 32x16 
+                new ImagePoint() { ImageNumber = 27, Position = new Point(16, 16), PositionType = PositionType.Right }); // h 96x16 
+        }
+
+        [Test]
+        public void RoundTheTableTopPushedOff()
+        {
+            //something wrong here?
+
+            // aieee  d
+            // aihhhhhh     
+            // ai     f
+            // ai
+            // bi
+            // bi     c   -80
+            // b gg   c   -96
+            //           -112
+            //           -128
+
+            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+                new ImagePoint() { ImageNumber = 3, Position = new Point(0, 64), PositionType = PositionType.BottomLeft }, // b 16x48
+                new ImagePoint() { ImageNumber = 5, Position = new Point(112, 80), PositionType = PositionType.BottomRight }, // c 16x32
+                new ImagePoint() { ImageNumber = 13, Position = new Point(112, 0), PositionType = PositionType.TopRight }, //d 16x16
+                new ImagePoint() { ImageNumber = 16, Position = new Point(32, 0), PositionType = PositionType.Top }, // e 48x16
+                new ImagePoint() { ImageNumber = 14, Position = new Point(112, 32), PositionType = PositionType.Right }, //f 16x16
+                new ImagePoint() { ImageNumber = 17, Position = new Point(32, 96), PositionType = PositionType.Bottom }, // g 32x16 
+                new ImagePoint() { ImageNumber = 27, Position = new Point(32, 16), PositionType = PositionType.Right }, // h 96x16 
+                new ImagePoint() { ImageNumber = 28, Position = new Point(16, 0), PositionType = PositionType.Top }); // i 16x96
+        }
+
+        [Test]
+        public void RoundTheTableTopPushedOff2()
+        {
+            // aieee  d
+            // aihhhhhh     
+            // ai     f
+            // ai
+            // bi
+            // bi     c   -80
+            // bigg   c   -96
+            //           -112
+            //           -128
+            //           -144
+
+            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+                new ImagePoint() { ImageNumber = 3, Position = new Point(0, 64), PositionType = PositionType.BottomLeft }, // b 16x48
+                new ImagePoint() { ImageNumber = 5, Position = new Point(112, 80), PositionType = PositionType.BottomRight }, // c 16x32
+                new ImagePoint() { ImageNumber = 13, Position = new Point(112, 0), PositionType = PositionType.TopRight }, //d 16x16
+                new ImagePoint() { ImageNumber = 16, Position = new Point(32, 0), PositionType = PositionType.Top }, // e 48x16
+                new ImagePoint() { ImageNumber = 14, Position = new Point(112, 32), PositionType = PositionType.Right }, //f 16x16
+                new ImagePoint() { ImageNumber = 17, Position = new Point(32, 96), PositionType = PositionType.Bottom }, // g 32x16 
+                new ImagePoint() { ImageNumber = 27, Position = new Point(32, 16), PositionType = PositionType.Right }, // h 96x16 
+                new ImagePoint() { ImageNumber = 29, Position = new Point(16, 0), PositionType = PositionType.Top }); // i 16x112
+        }
+
+        [Test]
+        public void RoundTheTableTopPushedOff3()
+        {
+            // aieee  d
+            // aihhhhhh     
+            // ai     f
+            // ai
+            //  i   
+            // bi        -80
+            // bi     c  -96
+            // bigg   c  -112
+            //           -128
+            //           -144
+
+            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+                new ImagePoint() { ImageNumber = 3, Position = new Point(0, 80), PositionType = PositionType.BottomLeft }, // b 16x48
+                new ImagePoint() { ImageNumber = 5, Position = new Point(112, 96), PositionType = PositionType.BottomRight }, // c 16x32
+                new ImagePoint() { ImageNumber = 13, Position = new Point(112, 0), PositionType = PositionType.TopRight }, //d 16x16
+                new ImagePoint() { ImageNumber = 16, Position = new Point(32, 0), PositionType = PositionType.Top }, // e 48x16
+                new ImagePoint() { ImageNumber = 14, Position = new Point(112, 32), PositionType = PositionType.Right }, //f 16x16
+                new ImagePoint() { ImageNumber = 17, Position = new Point(32, 112), PositionType = PositionType.Bottom }, // g 32x16 
+                new ImagePoint() { ImageNumber = 27, Position = new Point(32, 16), PositionType = PositionType.Right }, // h 80x16 
+                new ImagePoint() { ImageNumber = 30, Position = new Point(16, 0), PositionType = PositionType.Top }); // i 16x128
+        }
+
+        [Test]
+        public void DuplicateEmptyCreatedDoWeMatchAndRemove()
+        {
+            // accceee
+            // bdddeee
+            // bdddeee
+            // bdddwww
+            // 
+
+            DoTest(new ImagePoint() { ImageNumber = 6, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+                new ImagePoint() { ImageNumber = 3, Position = new Point(0, 16), PositionType = PositionType.Left }, // b 16x48
+                new ImagePoint() { ImageNumber = 16, Position = new Point(16, 0), PositionType = PositionType.Top }, // c 48x16
+                new ImagePoint() { ImageNumber = 25, Position = new Point(16, 16) }, // d 48x48 
+                new ImagePoint() { ImageNumber = 26, Position = new Point(64, 0) }); // e 48x48 
+        }
 
     }
 }

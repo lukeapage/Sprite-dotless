@@ -279,7 +279,7 @@ namespace spritedotless.BinPacker
                         emptySpace.Height += increaseY;
                     }
 
-                    posSetter.Position = new Point(posSetter.Position.Y + increaseY, posSetter.Position.Y);
+                    posSetter.Position = new Point(posSetter.Position.X, posSetter.Position.Y + increaseY);
                 }
             }
 
