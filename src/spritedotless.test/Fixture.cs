@@ -27,7 +27,7 @@ namespace spritedotless.test
             {
                 var env = new Env();
                 var spriteManager = new SpriteDotLessExtension(new TestUrlProvider());
-                env.AddExension(spriteManager);
+                env.AddPlugin(spriteManager);
                 spriteManager.SpriteConfig.ImagePath = GetTestImagePath();
                 return env;
             };
@@ -195,7 +195,7 @@ namespace spritedotless.test
         {
             Env env = AssertLess(input, expected, DefaultParser());
 
-            SpriteDotLessExtension manager = SpriteDotLessExtension.Get(env);
+            SpriteDotLessExtension manager = env.VisitorPlugins.OfType<SpriteDotLessExtension>().First();
 
             IDictionary<string, Image> images = manager.SpriteConfig.GetImages();
 

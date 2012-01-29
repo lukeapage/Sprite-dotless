@@ -11,17 +11,16 @@ namespace spritedotless.Nodes
 {
     public class Position : Node
     {
-        private SpriteImage _image;
-        public Position(SpriteImage image)
+        private Point _position { get; set;}
+
+        public Position(Point position)
         {
-            _image = image;
+            _position = position;
         }
 
         public override void AppendCSS(Env env)
         {
-            Point position = SpriteDotLessExtension.Get(env).GetImagePosition(_image);
-            
-            env.Output.AppendFormat(CultureInfo.InvariantCulture, "{0}px {1}px", -position.X, -position.Y);
+            env.Output.AppendFormat(CultureInfo.InvariantCulture, "{0}px {1}px", -_position.X, -_position.Y);
         }
     }
 }

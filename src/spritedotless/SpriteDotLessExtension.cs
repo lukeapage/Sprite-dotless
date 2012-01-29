@@ -5,19 +5,19 @@ using System.Text;
 using System.Drawing;
 using System.IO;
 using dotless.Core.Parser.Infrastructure;
+using dotless.Core.Plugins;
+using spritedotless.Functions;
+using dotless.Core.Parser.Tree;
+using dotless.Core.Parser.Infrastructure.Nodes;
+using spritedotless.Nodes;
 
 namespace spritedotless
 {
     /// <summary>
     ///  make non static and store in env
     /// </summary>
-    public class SpriteDotLessExtension : IExtension
+    public class SpriteDotLessExtension : VisitorPlugin, IFunctionPlugin
     {
-        public static SpriteDotLessExtension Get(Env env)
-        {
-            return env.GetExtension<SpriteDotLessExtension>();
-        }
-
         public SpriteDotLessExtension(IImageUrlProvider urlPovider)
         {
             SpriteConfig = new SpriteConfig();
@@ -25,10 +25,65 @@ namespace spritedotless
             UrlProvider = urlPovider;
         }
 
-        public void Setup(Env env)
+        #region Plugin Interfaces
+
+        public override string Name
         {
-            env.AddFunctionsFromAssembly(GetType().Assembly);
+            get
+            {
+                return "Sprite Dot Less";
+            }
         }
+
+        public Dictionary<string, Type> GetFunctions()
+        {
+            var returner = new Dictionary<string, Type>()
+            { {"Sprite", typeof(Sprite)},
+              {"SpritePosition", typeof(SpritePosition)}};
+            return returner;
+        }
+
+        public override VisitorPluginType AppliesTo
+        {
+            get { return VisitorPluginType.AfterEvaluation; }
+        }
+
+        private class SpriteNodeAndImage
+        {
+            public SpriteNode SpriteNode { get; set; }
+            public SpriteImage SpriteImage { get; set; }
+        }
+
+        private List<SpriteNodeAndImage> _spriteNodesToCalculate = new List<SpriteNodeAndImage>();
+
+        public override bool Execute(ref Node node)
+        {
+            SpriteNode spriteNode = node as SpriteNode;
+            if (spriteNode != null)
+            {
+                _spriteNodesToCalculate.Add(new SpriteNodeAndImage() { 
+                    SpriteNode = spriteNode,
+                    SpriteImage = GetSpriteImage(spriteNode.SpriteIdentifier, spriteNode.PositionType, spriteNode.Filename)
+                });
+
+                return false; // don't need to visit sub elements of SpriteNode
+            }
+            return true;
+        }
+
+        public override void OnPostVisiting(Env env)
+        {
+            base.OnPostVisiting(env);
+
+            //TODO - Get rid of GetImagePosition and put bin packing logic here.
+
+            foreach (SpriteNodeAndImage spriteNodeAndImage in _spriteNodesToCalculate)
+            {
+                spriteNodeAndImage.SpriteNode.CalculateCss(GetImagePosition(spriteNodeAndImage.SpriteImage));
+            }
+        }
+
+        #endregion
 
         public IImageUrlProvider UrlProvider
         {
