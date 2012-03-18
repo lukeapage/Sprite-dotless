@@ -10,12 +10,14 @@ using spritedotless.Functions;
 using dotless.Core.Parser.Tree;
 using dotless.Core.Parser.Infrastructure.Nodes;
 using spritedotless.Nodes;
+using System.ComponentModel;
 
 namespace spritedotless
 {
     /// <summary>
     ///  make non static and store in env
     /// </summary>
+    [Description("Sprite Packer Extension"), DisplayName("SpriteDotLess")]
     public class SpriteDotLessExtension : VisitorPlugin, IFunctionPlugin
     {
         public SpriteDotLessExtension(IImageUrlProvider urlPovider)
@@ -26,14 +28,6 @@ namespace spritedotless
         }
 
         #region Plugin Interfaces
-
-        public override string Name
-        {
-            get
-            {
-                return "Sprite Dot Less";
-            }
-        }
 
         public Dictionary<string, Type> GetFunctions()
         {
@@ -56,19 +50,25 @@ namespace spritedotless
 
         private List<SpriteNodeAndImage> _spriteNodesToCalculate = new List<SpriteNodeAndImage>();
 
-        public override bool Execute(ref Node node)
+        public override Node Execute(Node node, out bool continueVisiting)
         {
             SpriteNode spriteNode = node as SpriteNode;
             if (spriteNode != null)
             {
-                _spriteNodesToCalculate.Add(new SpriteNodeAndImage() { 
+                _spriteNodesToCalculate.Add(new SpriteNodeAndImage()
+                {
                     SpriteNode = spriteNode,
                     SpriteImage = GetSpriteImage(spriteNode.SpriteIdentifier, spriteNode.PositionType, spriteNode.Filename)
                 });
 
-                return false; // don't need to visit sub elements of SpriteNode
+                continueVisiting = false; // don't need to visit sub elements of SpriteNode
             }
-            return true;
+            else
+            {
+                continueVisiting = true;
+            }
+
+            return node;
         }
 
         public override void OnPostVisiting(Env env)
