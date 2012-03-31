@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Diagnostics;
 
 namespace spritedotless.BinPacker
 {
@@ -142,6 +143,8 @@ namespace spritedotless.BinPacker
 
             if (offsetX > 0)
             {
+                Logger.Log("Adding space on the left");
+
                 Add(new EmptySpace()
                 {
                     X = emptySpace.X,
@@ -153,6 +156,8 @@ namespace spritedotless.BinPacker
 
             if (offsetY > 0)
             {
+                Logger.Log("Adding space on the top");
+
                 Add(new EmptySpace()
                 {
                     X = emptySpace.X,
@@ -171,6 +176,8 @@ namespace spritedotless.BinPacker
                 {
                     if (offsetX == 0)
                     {
+                        Logger.Log("Adding 0 width space on the left");
+
                         Add(new EmptySpace()
                         {
                             X = emptySpace.X,
@@ -181,6 +188,8 @@ namespace spritedotless.BinPacker
                     }
                 } else if (positionType != PositionType.Horizontal)
                 {
+                    Logger.Log("Adding space on the right");
+
                     Add(new EmptySpace()
                     {
                         X = emptySpace.X + imageWidth + offsetX,
@@ -218,73 +227,130 @@ namespace spritedotless.BinPacker
             }
         }
 
-        public void IncreaseSizes(int newWidth, int newHeight, List<PositionSetter> positionDecidedImages)
+        public new void Add(EmptySpace item)
+        {
+            Debug.Assert(item.X + item.Width <= Width);
+            Debug.Assert(item.Y + item.Height <= Height);
+
+            base.Add(item);
+        }
+
+        public void IncreaseSizes(int newWidth, int newHeight, int moveIncreaseBoundaryX, int moveIncreaseBoundaryY, List<PositionSetter> positionDecidedImages)
         {
             int increaseX = newWidth - Width,
                 increaseY = newHeight - Height;
 
+            //
+            // 1432
+            // 1Y32
+            // XYZ2
+            // 56ZA
+            // 577A
+            // =>
+            // 1432
+            // 1Y32
+            // XYZ2
+            // -XYZA
+            // 56ZA
+            // 577A
+
+            Logger.Log("Increasing size by {0} x {1}  to  {2} x {3}", increaseX, increaseY, newWidth, newHeight);
+            Logger.Log("Moving anything after {0} x {1}", moveIncreaseBoundaryX, moveIncreaseBoundaryY);
+            Logger.Indent();
+
             if (increaseX > 0)
             {
-                foreach (EmptySpace emptySpace in this.Where((emptySpace) => emptySpace.X + emptySpace.Width == Width))
+                foreach (EmptySpace emptySpace in this.Where((emptySpace) => emptySpace.X + emptySpace.Width >= moveIncreaseBoundaryX))
                 {
-                    emptySpace.Width += increaseX;
+                    if (emptySpace.X > moveIncreaseBoundaryX)
+                        emptySpace.X += increaseX;
+                    else
+                        emptySpace.Width += increaseX;
+
+                    Debug.Assert(emptySpace.X + emptySpace.Width <= newWidth);
                 }
 
                 foreach (PositionSetter posSetter in positionDecidedImages.Where(
                     (positionDecidedImage) => positionDecidedImage.SpriteImage.PositionType == PositionType.Horizontal))
                 {
                     posSetter.Size = new Size(posSetter.Size.Width + increaseX, posSetter.Size.Height);
+
+                    Debug.Assert(posSetter.Position.X + posSetter.Size.Width <= newWidth);
                 }
 
                 // purposefully excludes horizontal and vertical positioned sprites
                 foreach (PositionSetter posSetter in positionDecidedImages.Where(
-                    (positionDecidedImage) => (positionDecidedImage.SpriteImage.PositionType & PositionType.Right) > 0))
+                    (positionDecidedImage) => 
+                        (positionDecidedImage.SpriteImage.PositionType & PositionType.Right) > 0 ||
+                        positionDecidedImage.Position.X >= moveIncreaseBoundaryX))
                 {
-                    // since the empty we are looking for "maps" on to the filled image, we only have to check if the empty
-                    // space contains the top left point of the positioned sprite - if so we know we can expand its width safely
-                    foreach (EmptySpace emptySpace in
-                        this.Where((emptySpace) => emptySpace.X + emptySpace.Width == posSetter.Position.X &&
-                        posSetter.Position.Y >= emptySpace.Y && posSetter.Position.Y <= emptySpace.Y + emptySpace.Height))
+                    if ((posSetter.SpriteImage.PositionType & PositionType.Right) > 0)
                     {
-                        emptySpace.Width += increaseX;
+                        // since the empty we are looking for "maps" on to the filled image, we only\ have to check if the empty
+                        // space contains the top left point of the positioned sprite - if so we know we can expand its width safely
+                        foreach (EmptySpace emptySpace in
+                            this.Where((emptySpace) => emptySpace.X + emptySpace.Width == posSetter.Position.X &&
+                            posSetter.Position.Y >= emptySpace.Y && posSetter.Position.Y <= emptySpace.Y + emptySpace.Height &&
+                            emptySpace.X + emptySpace.Width < moveIncreaseBoundaryX))
+                        {
+                            emptySpace.Width += increaseX;
+
+                            Debug.Assert(emptySpace.X + emptySpace.Width <= newWidth);
+                        }
                     }
 
                     posSetter.Position = new Point(posSetter.Position.X + increaseX, posSetter.Position.Y);
+                    Debug.Assert(posSetter.Position.X + posSetter.Size.Width <= newWidth);
                 }
             }
 
             if (increaseY > 0)
             {
-                foreach (EmptySpace emptySpace in this.Where((emptySpace) => emptySpace.Y + emptySpace.Height == Height))
+                foreach (EmptySpace emptySpace in this.Where((emptySpace) => emptySpace.Y + emptySpace.Height >= moveIncreaseBoundaryY))
                 {
-                    emptySpace.Height += increaseY;
+                    if (emptySpace.Y > moveIncreaseBoundaryY)
+                        emptySpace.Y += increaseY;
+                    else
+                        emptySpace.Height += increaseY;
+
+                    Debug.Assert(emptySpace.Y + emptySpace.Height <= newHeight);
                 }
 
                 foreach (PositionSetter posSetter in positionDecidedImages.Where(
                     (positionDecidedImage) => positionDecidedImage.SpriteImage.PositionType == PositionType.Vertical))
                 {
                     posSetter.Size = new Size(posSetter.Size.Width, posSetter.Size.Height + increaseY);
+                    Debug.Assert(posSetter.Position.Y + posSetter.Size.Height <= newHeight);
                 }
 
                 // purposefully excludes horizontal and vertical positioned sprites
                 foreach (PositionSetter posSetter in positionDecidedImages.Where(
-                    (positionDecidedImage) => (positionDecidedImage.SpriteImage.PositionType & PositionType.Bottom) > 0))
+                    (positionDecidedImage) => (positionDecidedImage.SpriteImage.PositionType & PositionType.Bottom) > 0 ||
+                        positionDecidedImage.Position.Y >= moveIncreaseBoundaryY))
                 {
-                    // since the empty we are looking for "maps" on to the filled image, we only have to check if the empty
-                    // space contains the top left point of the positioned sprite - if so we know we can expand its width safely
-                    foreach (EmptySpace emptySpace in
-                        this.Where((emptySpace) => emptySpace.Y + emptySpace.Height == posSetter.Position.Y &&
-                        posSetter.Position.X >= emptySpace.X && posSetter.Position.X <= emptySpace.X + emptySpace.Width))
+                    if ((posSetter.SpriteImage.PositionType & PositionType.Bottom) > 0)
                     {
-                        emptySpace.Height += increaseY;
+                        // since the empty we are looking for "maps" on to the filled image, we only have to check if the empty
+                        // space contains the top left point of the positioned sprite - if so we know we can expand its width safely
+                        foreach (EmptySpace emptySpace in
+                            this.Where((emptySpace) => emptySpace.Y + emptySpace.Height == posSetter.Position.Y &&
+                            posSetter.Position.X >= emptySpace.X && posSetter.Position.X <= emptySpace.X + emptySpace.Width &&
+                            emptySpace.Y + emptySpace.Height < moveIncreaseBoundaryY))
+                        {
+                            emptySpace.Height += increaseY;
+                            Debug.Assert(emptySpace.Y + emptySpace.Height <= newHeight);
+                        }
                     }
 
                     posSetter.Position = new Point(posSetter.Position.X, posSetter.Position.Y + increaseY);
+                    Debug.Assert(posSetter.Position.Y + posSetter.Size.Height <= newHeight);
                 }
             }
 
             Width = newWidth;
             Height = newHeight;
+
+            Logger.UnIndent();
         }
     }
 }

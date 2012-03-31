@@ -30,9 +30,19 @@ namespace spritedotless.BinPacker
             int horizontalArea = 0, verticalArea = 0;
             Action actionToSetHorizontalPositions, actionToSetVerticalPositions, action;
 
+            Logger.Log("Packing Horizontally");
+            Logger.Indent();
             // try packing horizontally, then try packing vertically
             actionToSetHorizontalPositions = PackBins(BinPackingMode.Horizontal, out horizontalArea);
+            Logger.UnIndent();
+
+            Logger.Log("Packing Vertically");
+            Logger.Indent();
             actionToSetVerticalPositions = PackBins(BinPackingMode.Vertical, out verticalArea);
+            Logger.UnIndent();
+
+            Logger.Log("Horizontal Area = {0}, Vertical Area = {1}", horizontalArea, verticalArea);
+
 
             if (verticalArea == horizontalArea)
             {
@@ -51,6 +61,8 @@ namespace spritedotless.BinPacker
             action = (verticalArea < horizontalArea) ?
                 actionToSetVerticalPositions :
                 actionToSetHorizontalPositions;
+
+            Logger.Log("After Examining sprites, decided on {0}", action == actionToSetVerticalPositions ? "Vertical" : "Horizontal");
 
             // execute the best to set the positions we have chosen
             action();
@@ -71,6 +83,8 @@ namespace spritedotless.BinPacker
             // get a starting width and height - by doing some analysis we know we need at least this size..
             // that minimises the resizing that needs to be done to only one direction.
             GetStartingWidthHeight(mode, out startingWidth, out startingHeight, out incrementX, out incrementY);
+
+            Logger.Log("Start size = {0} x {1}  Increment = {2} x {3}", startingWidth, startingHeight, incrementX, incrementY);
 
             // empty spaces records the empty space in the sprite map so we can work out where to put the next image
             EmptySpaces emptySpaces = new EmptySpaces(startingWidth, startingHeight);
@@ -219,6 +233,9 @@ namespace spritedotless.BinPacker
         /// </summary>
         private PositionSetter FindSpaceForSprite(SpriteImage sprite, EmptySpaces emptySpaces, BinPackingMode mode, List<PositionSetter> positionSetters, int incrementX, int incrementY)
         {
+            Logger.Log("Finding space for {0} - {1} x {2}  : {3}", sprite.Filename, sprite.Size.Width, sprite.Size.Height, sprite.PositionType.ToString());
+            Logger.Indent();
+
             List<CandidateEmpty> candidateEmpties = new List<CandidateEmpty>();
             CandidateEmpty lastSpace = null;
 
@@ -251,9 +268,13 @@ namespace spritedotless.BinPacker
                     throw new Exception("Cannot find any available space for sprite.");
                 }
 
+                Logger.Log("Will have to increase sprite size... Last space @ {0} x {1}", lastSpace.EmptySpace.X, lastSpace.EmptySpace.Y);
+
                 emptySpaces.IncreaseSizes(
                     RoundUpToIncrement(emptySpaces.Width + (lastSpace.ExcessWidth < 0 ? -lastSpace.ExcessWidth : 0), incrementX),
                     RoundUpToIncrement(emptySpaces.Height + (lastSpace.ExcessHeight < 0 ? -lastSpace.ExcessHeight : 0), incrementY),
+                    lastSpace.EmptySpace.X + lastSpace.EmptySpace.Width,
+                    lastSpace.EmptySpace.Y + lastSpace.EmptySpace.Height,
                     positionSetters);
 
                 candidateEmpties.Add(lastSpace);
@@ -303,10 +324,13 @@ namespace spritedotless.BinPacker
                 offsetX = candidateEmpties[0].ExcessWidth;
             }
 
+            Logger.Log("Best space found at {0} x {1}", candidateEmpties[0].EmptySpace.X, candidateEmpties[0].EmptySpace.Y);
+
             PositionSetter returner = new PositionSetter(sprite, new Point(candidateEmpties[0].EmptySpace.X + offsetX, candidateEmpties[0].EmptySpace.Y + offsetY), size);
 
             emptySpaces.FillUpSpace(candidateEmpties[0], mode, offsetX, offsetY);
 
+            Logger.UnIndent();
             return returner;
         }
 

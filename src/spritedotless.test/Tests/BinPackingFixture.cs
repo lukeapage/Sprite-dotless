@@ -534,29 +534,98 @@ namespace spritedotless.test.Tests
         [Test]
         public void RoundTheTableAwkwardHorizontal()
         {
-            // |0  |64 |128
             // ai      d
-            // ai     
-            // ai      
-            // ai
-            // eeeeeeeee   
-            //  i hhhhhh -80
-            //  i        -96
-            //  i        -112
-            //         f -128
-            // b         -144
+            // ai      f
+            // ai       
+            // ai       
+            //  i       
+            //  i       
+            //  i       
+            //  i       
+            // eeeeeeeee
+            // b  hhhhhh
             // b       c
             // bgg     c
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+            DoTest(
+                new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(0, 144), PositionType = PositionType.BottomLeft }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(128, 160), PositionType = PositionType.BottomRight }, // c 16x32
-                new ImagePoint() { ImageNumber = 13, Position = new Point(128, 0), PositionType = PositionType.TopRight }, //d 16x16
-                new ImagePoint() { ImageNumber = 16, Position = new Point(0, 64), PositionType = PositionType.Horizontal }, // e 48x16
-                new ImagePoint() { ImageNumber = 14, Position = new Point(128, 128), PositionType = PositionType.Right }, //f 16x16
-                new ImagePoint() { ImageNumber = 17, Position = new Point(16, 176), PositionType = PositionType.Bottom }, // g 32x16 
-                new ImagePoint() { ImageNumber = 27, Position = new Point(48, 80), PositionType = PositionType.Right }, // h 96x16 
-                new ImagePoint() { ImageNumber = 30, Position = new Point(16, 0), PositionType = PositionType.Top }); // i 16x128
+                new ImagePoint() { ImageNumber = 13, Position = new Point(128, 0), PositionType = PositionType.TopRight }, // d 16x16
+                new ImagePoint() { ImageNumber = 16, Position = new Point(0, 128), PositionType = PositionType.Horizontal }, // e 48x16
+                new ImagePoint() { ImageNumber = 14, Position = new Point(128, 16), PositionType = PositionType.Right }, // f 16x16
+                new ImagePoint() { ImageNumber = 17, Position = new Point(16, 176), PositionType = PositionType.Bottom }, // g 32x16
+                new ImagePoint() { ImageNumber = 27, Position = new Point(48, 144), PositionType = PositionType.Right }, // h 96x16
+                new ImagePoint() { ImageNumber = 30, Position = new Point(16, 0), PositionType = PositionType.Top } // i 16x128
+                );
+        }
+
+        [Test]
+        public void RoundTheTableAwkwardVertical()
+        {
+            // a  i     d
+            // a  i     f
+            // a  i      
+            // a  i      
+            // eeeihhhhhh
+            // b  i      
+            // b  i     c
+            // b  igg   c
+
+            DoTest(
+                new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+                new ImagePoint() { ImageNumber = 3, Position = new Point(0, 80), PositionType = PositionType.BottomLeft }, // b 16x48
+                new ImagePoint() { ImageNumber = 5, Position = new Point(144, 96), PositionType = PositionType.BottomRight }, // c 16x32
+                new ImagePoint() { ImageNumber = 13, Position = new Point(144, 0), PositionType = PositionType.TopRight }, // d 16x16
+                new ImagePoint() { ImageNumber = 16, Position = new Point(0, 64), PositionType = PositionType.Left }, // e 48x16
+                new ImagePoint() { ImageNumber = 14, Position = new Point(144, 16), PositionType = PositionType.Right }, // f 16x16
+                new ImagePoint() { ImageNumber = 17, Position = new Point(64, 112), PositionType = PositionType.Bottom }, // g 32x16
+                new ImagePoint() { ImageNumber = 27, Position = new Point(64, 64), PositionType = PositionType.Right }, // h 96x16
+                new ImagePoint() { ImageNumber = 30, Position = new Point(48, 0), PositionType = PositionType.Vertical } // i 16x128
+                );
+        }
+
+        private PositionType RandomPositionType()
+        {
+            int randomnumber = _rand.Next(10);
+
+            switch(randomnumber)
+            {
+                case 0:
+                    return PositionType.Vertical;
+                case 1:
+                    return PositionType.Anywhere;
+                case 2:
+                    return PositionType.Bottom;
+                case 3:
+                    return PositionType.BottomLeft;
+                case 4:
+                    return PositionType.BottomRight;
+                case 5:
+                    return PositionType.Top;
+                case 6:
+                    return PositionType.Left;
+                case 7:
+                    return PositionType.Right;
+                case 8:
+                    return PositionType.Top;
+                case 9:
+                    return PositionType.TopLeft;
+                default:
+                    return PositionType.TopRight;
+            }
+        }
+
+        [Test]
+        public void RandomLotsOfImages()
+        {
+            ImagePoint[] toTest = new ImagePoint[TestImages.Length];
+            for (int i = 0; i < TestImages.Length; i++)
+            {
+                toTest[i] = new ImagePoint() { ImageNumber = i+1, PositionType = RandomPositionType() };
+            }
+
+            DoTestJustNoOverlap(toTest);
         }
 
         [Test]

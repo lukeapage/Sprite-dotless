@@ -57,6 +57,7 @@
     <Compile Include="Functions\SpriteFunction.cs" />
     <Compile Include="Functions\SpritePosition.cs" />
     <Compile Include="IImageUrlProvider.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Nodes\Position.cs" />
     <Compile Include="Nodes\SpriteNode.cs" />
     <Compile Include="PositionType.cs" />

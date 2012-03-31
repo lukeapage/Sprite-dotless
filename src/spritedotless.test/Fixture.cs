@@ -9,6 +9,8 @@ using dotless.Test;
 using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Text.RegularExpressions;
+using spritedotless.Nodes;
 
 namespace spritedotless.test
 {
@@ -19,6 +21,8 @@ namespace spritedotless.test
     /// </summary>
     public class SpriteFixture : SpecFixtureBase
     {
+        protected Random _rand = new Random(301082);
+
         [SetUp]
         public new void SetupParser()
         {
@@ -63,6 +67,23 @@ namespace spritedotless.test
             });
         }
 
+        protected void DoTestJustNoOverlap(params ImagePoint[] imagePoints)
+        {
+            var input = CreateLess(imagePoints.ToArray());
+
+            var parser = DefaultParser();
+            var env = DefaultEnv();
+            var output = Evaluate(input, parser, env).Trim();
+
+            UpdatePositionsFromCss(output, imagePoints);
+
+            SpriteDotLessExtension manager = env.VisitorPlugins.OfType<SpriteDotLessExtension>().First();
+
+            IDictionary<string, Image> images = manager.SpriteConfig.GetImages();
+
+            AssertImage(images.First().Value, CreateImageAssertions(imagePoints));
+        }
+
         protected List<SpriteAssertion> CreateImageAssertions(params ImagePoint[] imagePoints)
         {
             List<SpriteAssertion> returner = new List<SpriteAssertion>();
@@ -80,11 +101,11 @@ namespace spritedotless.test
         protected string CreateCSS(params Point[] points)
         {
             StringBuilder sb = new StringBuilder();
-            char cssclass = 'a';
+            string cssclass = "aa";
             foreach (Point point in points)
             {
-                sb.Append(CreateCSSFromPosition(cssclass.ToString(), point));
-                cssclass++;
+                sb.Append(CreateCSSFromPosition(cssclass, point));
+                cssclass = upClass(cssclass);
             }
             return sb.ToString();
         }
@@ -97,10 +118,88 @@ namespace spritedotless.test
 }}", className, -position.X, -position.Y);
         }
 
+        protected void UpdatePositionsFromCss(string css, params ImagePoint[] imagePoints)
+        {
+            var regex = new Regex(@"\s*\.([a-z]+)\s*\{\s*background-position:\s*-?([0-9]+)[px]*\s*-?([0-9]+)[px]*\s*;?\s*\}", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+
+            char[,] grid = new char[100,100];
+            int maxw = 0, maxh = 0;
+
+            foreach (ImagePoint imagePoint in imagePoints)
+            {
+                var match = regex.Match(css);
+                if (!match.Success)
+                {
+                    throw new Exception("Failure reading back css");
+                }
+
+                string cssClass = match.Groups[1].Value;
+                int x = int.Parse(match.Groups[2].Value), y = int.Parse(match.Groups[3].Value), len = match.Index + match.Length;
+
+                css = css.Substring(len);
+
+                imagePoint.Position = new Point(x, y);
+
+                Size imageSize = TestImages.ElementAt(imagePoint.ImageNumber-1);
+                //new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+                Logger.Log("new ImagePoint() {{ ImageNumber = {3}, Position = new Point({0}, {1}), PositionType = PositionType.{4} }}, // {2} {5}x{6}",
+                    x, y, cssClass, imagePoint.ImageNumber, imagePoint.PositionType.ToString(), imageSize.Width, imageSize.Height);
+
+                x /= 16;
+                y /= 16;
+                int w = imageSize.Width / 16, h = imageSize.Height / 16;
+
+                maxh = Math.Max(maxh, y + h);
+                maxw = Math.Max(maxw, x + w);
+
+                if (imagePoint.PositionType == PositionType.Horizontal)
+                    w = 100 - x;
+
+                if (imagePoint.PositionType == PositionType.Vertical)
+                    h = 100 - y;
+
+                for (int i = x; i < x + w; i++)
+                {
+                    for (int j = y; j < y + h; j++)
+                    {
+                        grid[i,j] = cssClass[0];
+                    }
+                }
+            }
+
+            Logger.Log("");
+            Logger.Log("");
+
+            for (int row = 0; row < maxh; row++)
+            {
+                string rowText = "// ";
+                for(int col = 0; col < maxw; col++)
+                {
+                    if (grid[col, row] == 0)
+                        rowText += " ";
+                    else
+                        rowText += grid[col, row];
+                }
+                Logger.Log(rowText);
+            }
+        }
+
+        protected string upClass(string name)
+        {
+            char lastChar = name[name.Length - 1];
+
+            if (lastChar == 'z')
+            {
+                return upClass(name.Substring(0, name.Length - 1)) + 'a';
+            }
+
+            return name.Substring(0, name.Length - 1) + (lastChar++).ToString();
+        }
+
         protected string CreateLess(params ImagePoint[] imagePoints)
         {
             StringBuilder s = new StringBuilder();
-            char cssclass = 'a';
+            string cssclass = "aa";
 
             foreach (ImagePoint imagePoint in imagePoints)
             {
@@ -108,7 +207,7 @@ namespace spritedotless.test
 .{0} {{
   background-position: SpritePosition(""test{1}.png""{2});
 }}", cssclass, imagePoint.ImageNumber, imagePoint.PositionType != PositionType.Anywhere ? @", """", " + imagePoint.PositionType.ToString() : "");
-                cssclass++;
+                cssclass = upClass(cssclass);
             }
 
             return s.ToString();
@@ -158,7 +257,6 @@ namespace spritedotless.test
             }
             _imagesGenerated = true;
 
-            Random r = new Random(301082);
             int imageNumber = 1;
             string directory = GetTestImagePath();
 
@@ -170,7 +268,7 @@ namespace spritedotless.test
                     {
                         for (int y = 0; y < testImageSize.Height; y++)
                         {
-                            testImageBitmap.SetPixel(x, y, Color.FromArgb(r.Next()));
+                            testImageBitmap.SetPixel(x, y, Color.FromArgb(_rand.Next()));
                         }
                     }
 
