@@ -114,8 +114,8 @@ namespace spritedotless.BinPacker
             if (mode == BinPackingMode.Vertical)
             {
                 sprites.InsertionSort((a, b) => {
-                    int positionTypeA = PositionTypeScore(a.PositionType),
-                        positionTypeB = PositionTypeScore(b.PositionType);
+                    int positionTypeA = PositionTypeScore(a.PositionType, mode),
+                        positionTypeB = PositionTypeScore(b.PositionType, mode);
                     
                     if (positionTypeA < positionTypeB)
                     {
@@ -148,8 +148,8 @@ namespace spritedotless.BinPacker
             {
                 sprites.InsertionSort((a, b) =>
                     {
-                        int positionTypeA = PositionTypeScore(a.PositionType),
-                            positionTypeB = PositionTypeScore(b.PositionType);
+                        int positionTypeA = PositionTypeScore(a.PositionType, mode),
+                            positionTypeB = PositionTypeScore(b.PositionType, mode);
                     
                         if (positionTypeA < positionTypeB)
                         {
@@ -199,7 +199,7 @@ namespace spritedotless.BinPacker
                 SpriteList.Dimensions = new Size(emptySpaces.Width, emptySpaces.Height); };
         }
 
-        private int PositionTypeScore(PositionType type)
+        private int PositionTypeScore(PositionType type, BinPackingMode packingMode)
         {
             switch (type)
             {
@@ -225,7 +225,64 @@ namespace spritedotless.BinPacker
                     return 1;
                 default:
                     return 0;
+            }/*
+            if (packingMode == BinPackingMode.Horizontal)
+            {
+                switch (type)
+                {
+                    case PositionType.TopLeft:
+                        return 10;
+                    case PositionType.Left:
+                        return 9;
+                    case PositionType.Horizontal:
+                        return 8;
+                    case PositionType.BottomLeft:
+                        return 7;
+                    case PositionType.TopRight:
+                        return 6;
+                    case PositionType.BottomRight:
+                        return 5;
+                    case PositionType.Vertical:
+                        return 4;
+                    case PositionType.Right:
+                        return 3;
+                    case PositionType.Top:
+                        return 2;
+                    case PositionType.Bottom:
+                        return 1;
+                    default:
+                        return 0;
+                }
             }
+            else
+            {
+                // Vertical
+                switch (type)
+                {
+                    case PositionType.TopLeft:
+                        return 10;
+                    case PositionType.Top:
+                        return 9;
+                    case PositionType.Vertical:
+                        return 8;
+                    case PositionType.TopRight:
+                        return 7;
+                    case PositionType.BottomLeft:
+                        return 6;
+                    case PositionType.BottomRight:
+                        return 5;
+                    case PositionType.Bottom:
+                        return 4;
+                    case PositionType.Horizontal:
+                        return 3;
+                    case PositionType.Left:
+                        return 2;
+                    case PositionType.Right:
+                        return 1;
+                    default:
+                        return 0;
+                }
+            }*/
         }
 
         /// <summary>

@@ -172,7 +172,8 @@ namespace spritedotless.BinPacker
 
             if (excessWidth > 0 || (mode == BinPackingMode.Horizontal && (emptySpace.X + emptySpace.Width == this.Width)))
             {
-                if ((positionType & PositionType.Right) > 0 && mode == BinPackingMode.Horizontal)
+                //if ((positionType & PositionType.Right) > 0 && mode == BinPackingMode.Horizontal)
+                if ((positionType & PositionType.Right) > 0 || && mode == BinPackingMode.Horizontal)
                 {
                     if (offsetX == 0)
                     {

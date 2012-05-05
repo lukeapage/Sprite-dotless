@@ -15,7 +15,7 @@ namespace spritedotless.test.Tests
             // 12
             // 12
             // 13
-            DoTest(
+            DoTestJustNoOverlap(
                 new ImagePoint() { ImageNumber = 4, Position = new Point(0, 0) }, // 16 x 48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(16, 0) }, // 16 x 32
                 new ImagePoint() { ImageNumber = 6, Position = new Point(16, 32) }); // 16 x 16
@@ -27,7 +27,7 @@ namespace spritedotless.test.Tests
             // 31
             // 32
             // 32
-            DoTest(
+            DoTestJustNoOverlap(
                 new ImagePoint() { ImageNumber = 6, Position = new Point(16, 32) }, // 16 x 16
                 new ImagePoint() { ImageNumber = 5, Position = new Point(16, 0) }, // 16 x 32
                 new ImagePoint() { ImageNumber = 4, Position = new Point(0, 0) }); // 16 x 48
@@ -40,7 +40,7 @@ namespace spritedotless.test.Tests
             // 111234
             // 111235
             //   
-            DoTest(new ImagePoint() { ImageNumber = 1, Position = new Point(0, 0) }, // 48x48
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 1, Position = new Point(0, 0) }, // 48x48
                 new ImagePoint() { ImageNumber = 3, Position = new Point(48, 0) }, // 16x48
                 new ImagePoint() { ImageNumber = 4, Position = new Point(64, 0) }, // 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(80, 0) }, // 16x32
@@ -54,7 +54,7 @@ namespace spritedotless.test.Tests
             // 1369
             // 147x
             //   
-            DoTest(new ImagePoint() { ImageNumber = 3, Position = new Point(0, 0) }, // a 16x48
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 3, Position = new Point(0, 0) }, // a 16x48
                 new ImagePoint() { ImageNumber = 6, Position = new Point(16, 0) }, // b 16x16
                 new ImagePoint() { ImageNumber = 7, Position = new Point(16, 16) }, // c 16x16
                 new ImagePoint() { ImageNumber = 8, Position = new Point(16, 32) }, // d 16x16
@@ -73,7 +73,7 @@ namespace spritedotless.test.Tests
             // 1775
             // 1236
             //   
-            DoTest(new ImagePoint() { ImageNumber = 3, Position = new Point(0, 0) }, // a 16x48
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 3, Position = new Point(0, 0) }, // a 16x48
                 new ImagePoint() { ImageNumber = 6, Position = new Point(16, 32) }, // b 16x16
                 new ImagePoint() { ImageNumber = 7, Position = new Point(32, 32) }, // c 16x16
                 new ImagePoint() { ImageNumber = 8, Position = new Point(48, 0) }, // d 16x16
@@ -89,7 +89,7 @@ namespace spritedotless.test.Tests
             // 2111
             // 23344   
               
-            DoTest(new ImagePoint() { ImageNumber = 16, Position = new Point(16, 0) }, // a 48x16
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 16, Position = new Point(16, 0) }, // a 48x16
                 new ImagePoint() { ImageNumber = 5, Position = new Point(0, 0) }, // b 16x32
                 new ImagePoint() { ImageNumber = 17, Position = new Point(16, 16) }, // c 32x16
                 new ImagePoint() { ImageNumber = 18, Position = new Point(48, 16) }); // d 32x16
@@ -109,7 +109,7 @@ namespace spritedotless.test.Tests
             // 43
             // 4w
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 16) }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 16) }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(16, 16) }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(16, 64) }, // c 16x32
                 new ImagePoint() { ImageNumber = 20, Position = new Point(0, 80) }, // d 16x32
@@ -137,7 +137,7 @@ namespace spritedotless.test.Tests
             // 
             // vertical = 3x7 = 21. Horizontal = 6x4 = 24
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(16, 16) }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(16, 16) }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(32, 16) }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(32, 64) }, // c 16x32
                 new ImagePoint() { ImageNumber = 20, Position = new Point(16, 80) }, // d 16x32
@@ -169,7 +169,7 @@ namespace spritedotless.test.Tests
             //
             // vertical = 3x9 = 27. Horizontal = 6x4 = 24
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(16, 0) }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(16, 0) }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(32, 0) }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(32, 48) }, // c 16x32
                 new ImagePoint() { ImageNumber = 20, Position = new Point(16, 64) }, // d 16x32
@@ -198,7 +198,7 @@ namespace spritedotless.test.Tests
             //
             // vertical = 3x8 = 24. Horizontal = 6x4 = 24
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(16, 0) }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(16, 0) }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(32, 0) }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(48, 0) }, // c 16x32
                 new ImagePoint() { ImageNumber = 20, Position = new Point(48, 32) }, // d 16x32
@@ -230,7 +230,7 @@ namespace spritedotless.test.Tests
             //
             // vertical = 3x10 = 30. Horizontal = 5x5 = 25
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(16, 0) }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(16, 0) }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(32, 0) }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(32, 48) }, // c 16x32
                 new ImagePoint() { ImageNumber = 20, Position = new Point(48, 0) }, // d 16x32
@@ -247,7 +247,7 @@ namespace spritedotless.test.Tests
             // 1255
             // 1444
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0) }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0) }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(16, 0) }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(32, 0) }, // c 16x32
                 new ImagePoint() { ImageNumber = 16, Position = new Point(16, 48) }, // d 48x16
@@ -264,7 +264,7 @@ namespace spritedotless.test.Tests
             // 1255
             // 1444
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0) }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0) }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(16, 0) }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(32, 0) }, // c 16x32
                 new ImagePoint() { ImageNumber = 13, Position = new Point(48, 0) }, //f 16x16
@@ -284,7 +284,7 @@ namespace spritedotless.test.Tests
             // 2
             // 2
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(0, 64), PositionType = PositionType.BottomLeft }); // b 16x48
                 
         }
@@ -300,7 +300,7 @@ namespace spritedotless.test.Tests
             // 23
             // 23
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(0, 64), PositionType = PositionType.BottomLeft }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(16, 80), PositionType = PositionType.BottomRight }); // c 16x32
         }
@@ -316,7 +316,7 @@ namespace spritedotless.test.Tests
             // 23
             // 23
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(0, 64), PositionType = PositionType.BottomLeft }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(16, 80), PositionType = PositionType.BottomRight }, // c 16x32
                 new ImagePoint() { ImageNumber = 13, Position = new Point(16, 0), PositionType = PositionType.TopRight }); //f 16x16
@@ -330,7 +330,7 @@ namespace spritedotless.test.Tests
             // 1
             // 1
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
                 new ImagePoint() { ImageNumber = 13, Position = new Point(64, 0), PositionType = PositionType.TopRight }, //f 16x16
                 new ImagePoint() { ImageNumber = 16, Position = new Point(16, 0), PositionType = PositionType.Top }); // d 48x16
         }
@@ -346,7 +346,7 @@ namespace spritedotless.test.Tests
             // 2   3
             // 277 3
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(0, 64), PositionType = PositionType.BottomLeft }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(64, 80), PositionType = PositionType.BottomRight }, // c 16x32
                 new ImagePoint() { ImageNumber = 13, Position = new Point(64, 0), PositionType = PositionType.TopRight }, //f 16x16
@@ -369,7 +369,7 @@ namespace spritedotless.test.Tests
             //         -128
             //         -144
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(0, 80), PositionType = PositionType.BottomLeft }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(64, 96), PositionType = PositionType.BottomRight }, // c 16x32
                 new ImagePoint() { ImageNumber = 13, Position = new Point(64, 0), PositionType = PositionType.TopRight }, //f 16x16
@@ -393,7 +393,7 @@ namespace spritedotless.test.Tests
             //         -128
             //         -144
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(0, 80), PositionType = PositionType.BottomLeft }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(64, 96), PositionType = PositionType.BottomRight }, // c 16x32
                 new ImagePoint() { ImageNumber = 13, Position = new Point(64, 0), PositionType = PositionType.TopRight }, //d 16x16
@@ -421,7 +421,7 @@ namespace spritedotless.test.Tests
             //          -128
             //          -144
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(0, 80), PositionType = PositionType.BottomLeft }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(80, 96), PositionType = PositionType.BottomRight }, // c 16x32
                 new ImagePoint() { ImageNumber = 13, Position = new Point(80, 0), PositionType = PositionType.TopRight }, //d 16x16
@@ -445,7 +445,7 @@ namespace spritedotless.test.Tests
             //           -128
             //           -144
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(0, 64), PositionType = PositionType.BottomLeft }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(96, 80), PositionType = PositionType.BottomRight }, // c 16x32
                 new ImagePoint() { ImageNumber = 13, Position = new Point(96, 0), PositionType = PositionType.TopRight }, //d 16x16
@@ -470,7 +470,7 @@ namespace spritedotless.test.Tests
             //           -112
             //           -128
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(0, 64), PositionType = PositionType.BottomLeft }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(112, 80), PositionType = PositionType.BottomRight }, // c 16x32
                 new ImagePoint() { ImageNumber = 13, Position = new Point(112, 0), PositionType = PositionType.TopRight }, //d 16x16
@@ -495,7 +495,7 @@ namespace spritedotless.test.Tests
             //           -128
             //           -144
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(0, 64), PositionType = PositionType.BottomLeft }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(112, 80), PositionType = PositionType.BottomRight }, // c 16x32
                 new ImagePoint() { ImageNumber = 13, Position = new Point(112, 0), PositionType = PositionType.TopRight }, //d 16x16
@@ -520,7 +520,7 @@ namespace spritedotless.test.Tests
             //           -128
             //           -144
 
-            DoTest(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(0, 80), PositionType = PositionType.BottomLeft }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(112, 96), PositionType = PositionType.BottomRight }, // c 16x32
                 new ImagePoint() { ImageNumber = 13, Position = new Point(112, 0), PositionType = PositionType.TopRight }, //d 16x16
@@ -547,7 +547,7 @@ namespace spritedotless.test.Tests
             // b       c
             // bgg     c
 
-            DoTest(
+            DoTestJustNoOverlap(
                 new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(0, 144), PositionType = PositionType.BottomLeft }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(128, 160), PositionType = PositionType.BottomRight }, // c 16x32
@@ -572,7 +572,7 @@ namespace spritedotless.test.Tests
             // b  i     c
             // b  igg   c
 
-            DoTest(
+            DoTestJustNoOverlap(
                 new ImagePoint() { ImageNumber = 19, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(0, 80), PositionType = PositionType.BottomLeft }, // b 16x48
                 new ImagePoint() { ImageNumber = 5, Position = new Point(144, 96), PositionType = PositionType.BottomRight }, // c 16x32
@@ -585,14 +585,51 @@ namespace spritedotless.test.Tests
                 );
         }
 
-        private PositionType RandomPositionType()
+        [Test]
+        public void FailingRandomTest1Pre()
+        {
+            // gaaabbbced
+            // gaaabbbced
+            // gaaabbbc d
+            // g        f
+
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 1, Position = new Point(16, 0), PositionType = PositionType.Top }, // aa 48x48
+                                new ImagePoint() { ImageNumber = 2, Position = new Point(64, 0), PositionType = PositionType.Top }, // ab 48x48
+                                new ImagePoint() { ImageNumber = 3, Position = new Point(112, 0), PositionType = PositionType.Top }, // ac 16x48
+                                new ImagePoint() { ImageNumber = 4, Position = new Point(144, 0), PositionType = PositionType.Right }, // ad 16x48
+                                new ImagePoint() { ImageNumber = 5, Position = new Point(128, 0), PositionType = PositionType.Top }, // ae 16x32
+                                new ImagePoint() { ImageNumber = 6, Position = new Point(144, 48), PositionType = PositionType.BottomRight }, // af 16x16
+                                new ImagePoint() { ImageNumber = 7, Position = new Point(0, 0), PositionType = PositionType.Vertical } // ag 16x16
+                                );
+        }
+
+        [Test]
+        public void FailingRandomTest1()
+        {
+            // gaaabbbced
+            // gaaabbbced
+            // gaaabbbc d
+            // g        f
+
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 1, Position = new Point(16, 0), PositionType = PositionType.Top }, // aa 48x48
+                                new ImagePoint() { ImageNumber = 2, Position = new Point(64, 0), PositionType = PositionType.Top }, // ab 48x48
+                                new ImagePoint() { ImageNumber = 3, Position = new Point(112, 0), PositionType = PositionType.Top }, // ac 16x48
+                                new ImagePoint() { ImageNumber = 4, Position = new Point(144, 0), PositionType = PositionType.Right }, // ad 16x48
+                                new ImagePoint() { ImageNumber = 5, Position = new Point(128, 0), PositionType = PositionType.Top }, // ae 16x32
+                                new ImagePoint() { ImageNumber = 6, Position = new Point(144, 48), PositionType = PositionType.BottomRight }, // af 16x16
+                                new ImagePoint() { ImageNumber = 7, Position = new Point(0, 0), PositionType = PositionType.Vertical }, // ag 16x16
+                                new ImagePoint() { ImageNumber = 8, Position = new Point(0, 0), PositionType = PositionType.Left } //ah
+                                );
+        }
+
+        private PositionType RandomPositionType(PositionType verticalHorizontal = PositionType.Vertical)
         {
             int randomnumber = _rand.Next(10);
 
             switch(randomnumber)
             {
                 case 0:
-                    return PositionType.Vertical;
+                    return verticalHorizontal;
                 case 1:
                     return PositionType.Anywhere;
                 case 2:
@@ -619,8 +656,9 @@ namespace spritedotless.test.Tests
         [Test]
         public void RandomLotsOfImages()
         {
-            ImagePoint[] toTest = new ImagePoint[TestImages.Length];
-            for (int i = 0; i < TestImages.Length; i++)
+            int len = 8;
+            ImagePoint[] toTest = new ImagePoint[len];
+            for (int i = 0; i < len; i++)
             {
                 toTest[i] = new ImagePoint() { ImageNumber = i+1, PositionType = RandomPositionType() };
             }
@@ -637,7 +675,7 @@ namespace spritedotless.test.Tests
             // bdddwww
             // 
 
-            DoTest(new ImagePoint() { ImageNumber = 6, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 6, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // a 16x64
                 new ImagePoint() { ImageNumber = 3, Position = new Point(0, 16), PositionType = PositionType.Left }, // b 16x48
                 new ImagePoint() { ImageNumber = 16, Position = new Point(16, 0), PositionType = PositionType.Top }, // c 48x16
                 new ImagePoint() { ImageNumber = 25, Position = new Point(16, 16) }, // d 48x48 

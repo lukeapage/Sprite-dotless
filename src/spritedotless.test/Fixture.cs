@@ -162,7 +162,7 @@ namespace spritedotless.test
                 {
                     for (int j = y; j < y + h; j++)
                     {
-                        grid[i,j] = cssClass[0];
+                        grid[i,j] = cssClass[cssClass.Length-1];
                     }
                 }
             }
@@ -193,7 +193,7 @@ namespace spritedotless.test
                 return upClass(name.Substring(0, name.Length - 1)) + 'a';
             }
 
-            return name.Substring(0, name.Length - 1) + (lastChar++).ToString();
+            return name.Substring(0, name.Length - 1) + (++lastChar).ToString();
         }
 
         protected string CreateLess(params ImagePoint[] imagePoints)
