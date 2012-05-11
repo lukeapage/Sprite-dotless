@@ -212,17 +212,17 @@ namespace spritedotless.BinPacker
                 case PositionType.BottomRight:
                     return 7;
                 case PositionType.Vertical:
-                    return 6;
-                case PositionType.Horizontal:
-                    return 5;
-                case PositionType.Top:
-                    return 4;
-                case PositionType.Left:
-                    return 3;
-                case PositionType.Bottom:
                     return 2;
-                case PositionType.Right:
+                case PositionType.Horizontal:
                     return 1;
+                case PositionType.Top:
+                    return 6;
+                case PositionType.Left:
+                    return 5;
+                case PositionType.Bottom:
+                    return 4;
+                case PositionType.Right:
+                    return 3;
                 default:
                     return 0;
             }/*
@@ -293,38 +293,13 @@ namespace spritedotless.BinPacker
             Logger.Log("Finding space for {0} - {1} x {2}  : {3}", sprite.Filename, sprite.Size.Width, sprite.Size.Height, sprite.PositionType.ToString());
             Logger.Indent();
 
-            List<CandidateEmpty> candidateEmpties = new List<CandidateEmpty>();
+            List<CandidateEmpty> candidateEmpties;
             CandidateEmpty lastSpace = null;
 
-            // go through every empty space
-            foreach (EmptySpace empty in emptySpaces)
-            {
-                // create a candidate
-                CandidateEmpty candidate = new CandidateEmpty(empty, sprite);
-
-                //if it fits its a candidate
-                if (candidate.IsFit() && candidate.IsAppropriate(emptySpaces.Width, emptySpaces.Height))
-                {
-                    candidateEmpties.Add(candidate);
-                }
-
-                //otherwise determine if its the last available space
-                if (candidate.IsAppropriate(emptySpaces.Width, emptySpaces.Height) &&
-                    (lastSpace == null || 
-                        (mode == BinPackingMode.Horizontal && lastSpace.EmptySpace.X > candidate.EmptySpace.X && candidate.EmptySpace.Height >= sprite.Size.Height && (candidate.EmptySpace.X + candidate.EmptySpace.Width == emptySpaces.Width)) ||
-                        (mode == BinPackingMode.Vertical && lastSpace.EmptySpace.Y > candidate.EmptySpace.Y && candidate.EmptySpace.Width >= sprite.Size.Width) && (candidate.EmptySpace.Y + candidate.EmptySpace.Height == emptySpaces.Height)))
-                {
-                    lastSpace = candidate;
-                }
-            }
+            candidateEmpties = emptySpaces.FindCandidates(mode, sprite, positionSetters, out lastSpace);
 
             if (candidateEmpties.Count == 0)
             {
-                if (lastSpace == null)
-                {
-                    throw new Exception("Cannot find any available space for sprite.");
-                }
-
                 Logger.Log("Will have to increase sprite size... Last space @ {0} x {1}", lastSpace.EmptySpace.X, lastSpace.EmptySpace.Y);
 
                 emptySpaces.IncreaseSizes(
@@ -415,6 +390,7 @@ namespace spritedotless.BinPacker
             height = 0;
             incrementX = 1;
             incrementY = 1;
+            Dictionary<PositionType, bool> singleUsePositions = new Dictionary<PositionType, bool>();
             int widthNeededTop = 0,
                 widthNeededBottom = 0,
                 widthNeededLeft = 0,
@@ -445,18 +421,22 @@ namespace spritedotless.BinPacker
                         widthNeededLeft = Math.Min(widthNeededLeft, sprite.Size.Width);
                         break;
                     case PositionType.TopLeft:
+                        CheckSingleUsePosition(PositionType.TopLeft, singleUsePositions);
                         widthNeededTop += sprite.Size.Width;
                         heightNeededLeft += sprite.Size.Height;
                         break;
                     case PositionType.TopRight:
+                        CheckSingleUsePosition(PositionType.TopRight, singleUsePositions);
                         widthNeededTop += sprite.Size.Width;
                         heightNeededRight += sprite.Size.Height;
                         break;
                     case PositionType.BottomLeft:
+                        CheckSingleUsePosition(PositionType.BottomLeft, singleUsePositions);
                         widthNeededBottom += sprite.Size.Width;
                         heightNeededLeft += sprite.Size.Height;
                         break;
                     case PositionType.BottomRight:
+                        CheckSingleUsePosition(PositionType.BottomRight, singleUsePositions);
                         widthNeededBottom += sprite.Size.Width;
                         heightNeededRight += sprite.Size.Height;
                         break;
@@ -466,6 +446,7 @@ namespace spritedotless.BinPacker
                         {
                             throw new Exception("Cannot have sprites at position vertical with incompatible heights");
                         }
+                        CheckMutexPosition(PositionType.Vertical, PositionType.Horizontal, singleUsePositions);
                         incrementY = Math.Max(incrementY, sprite.Size.Height);
                         widthNeededTop += sprite.Size.Width;
                         widthNeededBottom += sprite.Size.Width;
@@ -476,6 +457,8 @@ namespace spritedotless.BinPacker
                         {
                             throw new Exception("Cannot have sprites at position horizontal with incompatible widths");
                         }
+                        CheckMutexPosition(PositionType.Horizontal, PositionType.Vertical, singleUsePositions);
+
                         incrementX = Math.Max(incrementX, sprite.Size.Width);
                         heightNeededLeft += sprite.Size.Height;
                         heightNeededRight += sprite.Size.Height;
@@ -493,9 +476,6 @@ namespace spritedotless.BinPacker
                 }
             }
 
-            //width += widthNeededLeft + widthNeededRight;
-            //height += heightNeededTop + heightNeededBottom;
-
             width = Math.Max(Math.Max(width, widthNeededLeft), widthNeededRight);
             height = Math.Max(Math.Max(height, heightNeededTop), heightNeededBottom);
 
@@ -504,6 +484,24 @@ namespace spritedotless.BinPacker
 
             width = RoundUpToIncrement(width, incrementX);
             height = RoundUpToIncrement(height, incrementY);
+        }
+
+        private void CheckSingleUsePosition(PositionType positionType, Dictionary<PositionType, bool> singleUsePositions)
+        {
+            if (singleUsePositions.ContainsKey(positionType))
+            {
+                throw new Exception(String.Format("You may only have one sprite in the position {0}", positionType));
+            }
+            singleUsePositions.Add(positionType, true);
+        }
+
+        private void CheckMutexPosition(PositionType positionType, PositionType positionTypeOther, Dictionary<PositionType, bool> singleUsePositions)
+        {
+            if (singleUsePositions.ContainsKey(positionTypeOther))
+            {
+                throw new Exception(String.Format("You may only have sprites either in the positions {0} or {1}. You have both.", positionType, positionTypeOther));
+            }
+            singleUsePositions.Add(positionType, true);
         }
     }
 }

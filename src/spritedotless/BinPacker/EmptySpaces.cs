@@ -19,6 +19,91 @@ namespace spritedotless.BinPacker
             Add(new EmptySpace() { X = 0, Y = 0, Width = Width, Height = Height });
         }
 
+        /// <summary>
+        ///  Find the candidates for places to put the sprite
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <param name="sprite"></param>
+        /// <param name="lastSpace"></param>
+        /// <returns></returns>
+        public List<CandidateEmpty> FindCandidates(BinPackingMode mode, SpriteImage sprite, List<PositionSetter> positionSetters, out CandidateEmpty lastSpace)
+        {
+            List<CandidateEmpty> candidateEmpties = new List<CandidateEmpty>();
+            lastSpace = null;
+
+            // go through every empty space
+            foreach (EmptySpace empty in this)
+            {
+                // create a candidate
+                CandidateEmpty candidate = new CandidateEmpty(empty, sprite);
+
+                //if it fits its a candidate
+                if (candidate.IsFit() && candidate.IsAppropriate(this.Width, this.Height))
+                {
+                    candidateEmpties.Add(candidate);
+                }
+
+                //otherwise determine if its the last available space
+                if (candidate.IsAppropriate(this.Width, this.Height) &&
+                    (lastSpace == null ||
+                        (mode == BinPackingMode.Horizontal && lastSpace.EmptySpace.X > candidate.EmptySpace.X && candidate.EmptySpace.Height >= sprite.Size.Height && (candidate.EmptySpace.X + candidate.EmptySpace.Width == this.Width)) ||
+                        (mode == BinPackingMode.Vertical && lastSpace.EmptySpace.Y > candidate.EmptySpace.Y && candidate.EmptySpace.Width >= sprite.Size.Width) && (candidate.EmptySpace.Y + candidate.EmptySpace.Height == this.Height)))
+                {
+                    lastSpace = candidate;
+                }
+            }
+
+            if (lastSpace == null)
+            {
+                if ((sprite.PositionType == PositionType.Horizontal || sprite.PositionType == PositionType.Vertical))
+                {
+                    // because of the requirement for horizontal and vertical it is relatively easy to get a situation that does not fit
+                    // however.. it always will, we just need to be inventive.
+
+                    lastSpace = this.IncreaseSizesForHorizontalOrVertical(sprite, positionSetters);
+                    candidateEmpties.Add(lastSpace);
+                }
+            }
+
+
+            return candidateEmpties;
+        }
+
+        private CandidateEmpty IncreaseSizesForHorizontalOrVertical(SpriteImage sprite, List<PositionSetter> positionSetters)
+        {
+            bool isHorizontal = sprite.PositionType == PositionType.Horizontal;
+            int spaceTakenUp = 0, spaceToMake, newWidth, newHeight;
+
+            foreach (PositionSetter posSetter in positionSetters)
+            {
+                if ((isHorizontal && (posSetter.SpriteImage.PositionType & PositionType.Bottom) > 0) ||
+                    (!isHorizontal && (posSetter.SpriteImage.PositionType & PositionType.Right) > 0))
+                {
+                    spaceTakenUp = Math.Max(spaceTakenUp, isHorizontal ? posSetter.Size.Height : posSetter.Size.Width);
+                }
+            }
+
+            spaceToMake = (isHorizontal ? sprite.Size.Height : sprite.Size.Width) + spaceTakenUp;
+            newWidth = Width + (isHorizontal ? 0 : spaceToMake);
+            newHeight = Height + (isHorizontal ? spaceToMake : 0);
+
+            this.IncreaseSizes(newWidth, newHeight, newWidth, newHeight, positionSetters);
+
+            EmptySpace e = new EmptySpace()
+            {
+                X = isHorizontal ? 0 : newWidth - spaceToMake,
+                Y = isHorizontal ? newHeight - spaceToMake : 0,
+                Width = isHorizontal ? newWidth : sprite.Size.Width,
+                Height = isHorizontal ? sprite.Size.Height : newHeight
+            };
+
+            this.Add(e);
+
+            // we need to work out how much we have to pull apart the current configuration to get an empty space in there.
+            // think of it like a sawtooth
+            return new CandidateEmpty(e, sprite);
+        }
+
         public void FillUpSpace(CandidateEmpty candidate, BinPackingMode mode, int offsetX, int offsetY)
         {
             Remove(candidate.EmptySpace);
@@ -130,6 +215,9 @@ namespace spritedotless.BinPacker
 
         private void FillUpSpace(EmptySpace emptySpace, BinPackingMode mode, PositionType positionType, int imageWidth, int imageHeight, int offsetX = 0, int offsetY = 0)
         {
+            Logger.Log("Filling up space [{0}x{1} size={2},{3}] at [{4},{5}] for [size= {6},{7}]", emptySpace.X, emptySpace.Y, emptySpace.Width, emptySpace.Height, 
+                offsetX, offsetY, imageWidth, imageHeight);
+
             // image might be spanned across empty spaces.. for our purposes make sure we only consider the bit in this space
             if (imageWidth + offsetX > emptySpace.Width)
             {
@@ -207,6 +295,8 @@ namespace spritedotless.BinPacker
                 {
                     if (offsetY == 0)
                     {
+                        Logger.Log("Adding 0 space on the top");
+
                         Add(new EmptySpace()
                         {
                             X = emptySpace.X,
@@ -217,6 +307,8 @@ namespace spritedotless.BinPacker
                     }
                 } else if (positionType != PositionType.Vertical)
                 {
+                    Logger.Log("Adding space on the bottom");
+
                     Add(new EmptySpace()
                     {
                         X = emptySpace.X,

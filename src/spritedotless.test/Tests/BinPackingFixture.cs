@@ -622,35 +622,31 @@ namespace spritedotless.test.Tests
                                 );
         }
 
-        private PositionType RandomPositionType(PositionType verticalHorizontal = PositionType.Vertical)
+        private List<PositionType> GetNewAvailablePositionTypes()
         {
-            int randomnumber = _rand.Next(10);
+            return Enum.GetValues(typeof(PositionType)).Cast<PositionType>().ToList();
+        }
 
-            switch(randomnumber)
+        private PositionType RandomPositionType(List<PositionType> available)
+        {
+            PositionType positionType = available[_rand.Next(available.Count)];
+
+            if (positionType == PositionType.Vertical)
             {
-                case 0:
-                    return verticalHorizontal;
-                case 1:
-                    return PositionType.Anywhere;
-                case 2:
-                    return PositionType.Bottom;
-                case 3:
-                    return PositionType.BottomLeft;
-                case 4:
-                    return PositionType.BottomRight;
-                case 5:
-                    return PositionType.Top;
-                case 6:
-                    return PositionType.Left;
-                case 7:
-                    return PositionType.Right;
-                case 8:
-                    return PositionType.Top;
-                case 9:
-                    return PositionType.TopLeft;
-                default:
-                    return PositionType.TopRight;
+                available.Remove(PositionType.Horizontal);
             }
+
+            if (positionType == PositionType.Horizontal)
+            {
+                available.Remove(PositionType.Vertical);
+            }
+
+            if (positionType == PositionType.TopLeft || positionType == PositionType.TopRight || positionType == PositionType.BottomRight || positionType == PositionType.BottomLeft)
+            {
+                available.Remove(positionType);
+            }
+
+            return positionType;
         }
 
         [Test]
@@ -658,9 +654,10 @@ namespace spritedotless.test.Tests
         {
             int len = 8;
             ImagePoint[] toTest = new ImagePoint[len];
+            var positionsAvailable = GetNewAvailablePositionTypes();
             for (int i = 0; i < len; i++)
             {
-                toTest[i] = new ImagePoint() { ImageNumber = i+1, PositionType = RandomPositionType() };
+                toTest[i] = new ImagePoint() { ImageNumber = i+1, PositionType = RandomPositionType(positionsAvailable) };
             }
 
             DoTestJustNoOverlap(toTest);
