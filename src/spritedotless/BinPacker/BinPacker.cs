@@ -91,23 +91,6 @@ namespace spritedotless.BinPacker
 
             // split the sprites into ones that can go anywhere and ones that can go to a specific location
             List<SpriteImage> sprites = new List<SpriteImage>(SpriteList.Sprites.Values);
-            //List<SpriteImage> spritesInSpecificPlaces = new List<SpriteImage>(SpriteList.Sprites.Values.Where(sprite => sprite.PositionType != PositionType.Anywhere));
-
-            //Func<SpriteImage, bool> isBeforeFunc;
-
-            //if (mode == BinPackingMode.Horizontal)
-            //{
-                //    isBeforeFunc = (sprite) => sprite.PositionType == PositionType.Left || 
-            //}
-            //else
-            //{
-            //}
-
-            //spritesInSpecificPlaces.Sort((a, b) => 
-
-            //foreach (SpriteImage sprite in spritesInSpecificPlaces)
-            //{
-            //}
 
             // Sort by the opposite dimension so we use up the biggest space with the biggest 
             // insertion sort so it is stable - helps unit tests
@@ -211,10 +194,6 @@ namespace spritedotless.BinPacker
                     return 8;
                 case PositionType.BottomRight:
                     return 7;
-                case PositionType.Vertical:
-                    return 2;
-                case PositionType.Horizontal:
-                    return 1;
                 case PositionType.Top:
                     return 6;
                 case PositionType.Left:
@@ -223,66 +202,13 @@ namespace spritedotless.BinPacker
                     return 4;
                 case PositionType.Right:
                     return 3;
+                case PositionType.Vertical:
+                    return 2;
+                case PositionType.Horizontal:
+                    return 1;
                 default:
                     return 0;
-            }/*
-            if (packingMode == BinPackingMode.Horizontal)
-            {
-                switch (type)
-                {
-                    case PositionType.TopLeft:
-                        return 10;
-                    case PositionType.Left:
-                        return 9;
-                    case PositionType.Horizontal:
-                        return 8;
-                    case PositionType.BottomLeft:
-                        return 7;
-                    case PositionType.TopRight:
-                        return 6;
-                    case PositionType.BottomRight:
-                        return 5;
-                    case PositionType.Vertical:
-                        return 4;
-                    case PositionType.Right:
-                        return 3;
-                    case PositionType.Top:
-                        return 2;
-                    case PositionType.Bottom:
-                        return 1;
-                    default:
-                        return 0;
-                }
             }
-            else
-            {
-                // Vertical
-                switch (type)
-                {
-                    case PositionType.TopLeft:
-                        return 10;
-                    case PositionType.Top:
-                        return 9;
-                    case PositionType.Vertical:
-                        return 8;
-                    case PositionType.TopRight:
-                        return 7;
-                    case PositionType.BottomLeft:
-                        return 6;
-                    case PositionType.BottomRight:
-                        return 5;
-                    case PositionType.Bottom:
-                        return 4;
-                    case PositionType.Horizontal:
-                        return 3;
-                    case PositionType.Left:
-                        return 2;
-                    case PositionType.Right:
-                        return 1;
-                    default:
-                        return 0;
-                }
-            }*/
         }
 
         /// <summary>
