@@ -650,14 +650,64 @@ namespace spritedotless.test.Tests
         }
 
         [Test]
+        public void TwelveRandomPre()
+        {
+            // g    bbb d
+            // aaa  bbb d
+            // aaa  bbb d
+            // aaac bbb  
+            // h  cebbb  
+            // i  cejkl f
+
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 1, Position = new Point(0, 16), PositionType = PositionType.Left }, // aa 48x48
+                    new ImagePoint() { ImageNumber = 2, Position = new Point(80, 0), PositionType = PositionType.Vertical }, // ab 48x48
+                    new ImagePoint() { ImageNumber = 3, Position = new Point(48, 48), PositionType = PositionType.Bottom }, // ac 16x48
+                    new ImagePoint() { ImageNumber = 4, Position = new Point(144, 0), PositionType = PositionType.TopRight }, // ad 16x48
+                    new ImagePoint() { ImageNumber = 5, Position = new Point(64, 64), PositionType = PositionType.Bottom }, // ae 16x32
+                    new ImagePoint() { ImageNumber = 6, Position = new Point(144, 80), PositionType = PositionType.BottomRight }, // af 16x16
+                    new ImagePoint() { ImageNumber = 7, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // ag 16x16
+                    new ImagePoint() { ImageNumber = 8, Position = new Point(0, 64), PositionType = PositionType.Left }, // ah 16x16
+                    new ImagePoint() { ImageNumber = 9, Position = new Point(0, 80), PositionType = PositionType.BottomLeft }, // ai 16x16
+                    new ImagePoint() { ImageNumber = 10, Position = new Point(80, 80), PositionType = PositionType.Bottom }, // aj 16x16
+                    new ImagePoint() { ImageNumber = 11, Position = new Point(96, 80), PositionType = PositionType.Bottom }, // ak 16x16
+                    new ImagePoint() { ImageNumber = 12, Position = new Point(112, 80), PositionType = PositionType.Bottom } // al 16x16
+                    );
+        }
+
+        [Test]
+        public void TwelveRandom()
+        {
+            // hm  aaa  f
+            // lg  jaa  i
+            //     aaa   
+            // d c aaabbb
+            // d ceaaabbb
+            // d cekaabbb
+
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 1, Position = new Point(64, 0), PositionType = PositionType.Vertical }, // aa 48x48
+                new ImagePoint() { ImageNumber = 2, Position = new Point(112, 48), PositionType = PositionType.BottomRight }, // ab 48x48
+                new ImagePoint() { ImageNumber = 3, Position = new Point(32, 48), PositionType = PositionType.Bottom }, // ac 16x48
+                new ImagePoint() { ImageNumber = 4, Position = new Point(0, 48), PositionType = PositionType.BottomLeft }, // ad 16x48
+                new ImagePoint() { ImageNumber = 5, Position = new Point(48, 64), PositionType = PositionType.Bottom }, // ae 16x32
+                new ImagePoint() { ImageNumber = 6, Position = new Point(144, 0), PositionType = PositionType.TopRight }, // af 16x16
+                new ImagePoint() { ImageNumber = 7, Position = new Point(16, 16), PositionType = PositionType.Anywhere }, // ag 16x16
+                new ImagePoint() { ImageNumber = 8, Position = new Point(0, 0), PositionType = PositionType.Left }, // ah 16x16
+                new ImagePoint() { ImageNumber = 9, Position = new Point(144, 16), PositionType = PositionType.Right }, // ai 16x16
+                new ImagePoint() { ImageNumber = 10, Position = new Point(64, 16), PositionType = PositionType.Anywhere }, // aj 16x16
+                new ImagePoint() { ImageNumber = 11, Position = new Point(64, 80), PositionType = PositionType.Bottom }, // ak 16x16
+                new ImagePoint() { ImageNumber = 12, Position = new Point(0, 16), PositionType = PositionType.Left }, // al 16x16
+                new ImagePoint() { ImageNumber = 13, Position = new Point(16, 0), PositionType = PositionType.Top }); // am 16x16
+        }
+
+        [Test]
         public void RandomLotsOfImages()
         {
-            int len = 8;
+            int len = 13;
             ImagePoint[] toTest = new ImagePoint[len];
             var positionsAvailable = GetNewAvailablePositionTypes();
             for (int i = 0; i < len; i++)
             {
-                toTest[i] = new ImagePoint() { ImageNumber = i+1, PositionType = RandomPositionType(positionsAvailable) };
+                toTest[i] = new ImagePoint() { ImageNumber = i + 1, PositionType = RandomPositionType(positionsAvailable) };
             }
 
             DoTestJustNoOverlap(toTest);

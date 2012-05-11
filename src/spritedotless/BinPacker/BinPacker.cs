@@ -427,7 +427,7 @@ namespace spritedotless.BinPacker
             {
                 throw new Exception(String.Format("You may only have sprites either in the positions {0} or {1}. You have both.", positionType, positionTypeOther));
             }
-            singleUsePositions.Add(positionType, true);
+            singleUsePositions[positionType] = true;
         }
     }
 }
