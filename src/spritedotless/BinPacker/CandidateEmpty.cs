@@ -28,13 +28,15 @@ namespace spritedotless.BinPacker
                 return false;
             }
 
-            if (((PositionType & spritedotless.PositionType.Bottom) > 0) &&
+            if (((PositionType & spritedotless.PositionType.Bottom) > 0 ||
+                PositionType == spritedotless.PositionType.Vertical) &&
                 EmptySpace.Y  + EmptySpace.Height < height)
             {
                 return false;
             }
 
-            if (((PositionType & spritedotless.PositionType.Right) > 0) &&
+            if (((PositionType & spritedotless.PositionType.Right) > 0 || 
+                PositionType == spritedotless.PositionType.Horizontal) &&
                 EmptySpace.X + EmptySpace.Width < width)
             {
                 return false;

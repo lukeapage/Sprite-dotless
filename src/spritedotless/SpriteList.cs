@@ -58,7 +58,7 @@ namespace spritedotless
 
             foreach (SpriteImage spriteimage in Sprites.Values)
             {
-                spriteimage.DrawOnTo(g);
+                spriteimage.DrawOnTo(g, Dimensions);
             }
 
             return bitmap;

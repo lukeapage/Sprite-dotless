@@ -226,7 +226,7 @@ namespace spritedotless.BinPacker
 
             if (candidateEmpties.Count == 0)
             {
-                Logger.Log("Will have to increase sprite size... Last space @ {0} x {1}", lastSpace.EmptySpace.X, lastSpace.EmptySpace.Y);
+                Logger.Log("No emtpies found, Will have to increase sprite size... Last space @ {0} x {1}. Size = {2} x {3}", lastSpace.EmptySpace.X, lastSpace.EmptySpace.Y, lastSpace.EmptySpace.Width, lastSpace.EmptySpace.Height);
 
                 emptySpaces.IncreaseSizes(
                     RoundUpToIncrement(emptySpaces.Width + (lastSpace.ExcessWidth < 0 ? -lastSpace.ExcessWidth : 0), incrementX),

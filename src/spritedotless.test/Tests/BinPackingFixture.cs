@@ -558,6 +558,15 @@ namespace spritedotless.test.Tests
                 new ImagePoint() { ImageNumber = 27, Position = new Point(48, 144), PositionType = PositionType.Right }, // h 96x16
                 new ImagePoint() { ImageNumber = 30, Position = new Point(16, 0), PositionType = PositionType.Top } // i 16x128
                 );
+
+            // a   i      d
+            // a   i       
+            // a   i       
+            // a   i       
+            // eeeeiehhhhhh
+            // b   i      f
+            // b   i      c
+            // b   igg    c
         }
 
         [Test]
@@ -702,7 +711,7 @@ namespace spritedotless.test.Tests
         [Test]
         public void RandomLotsOfImages()
         {
-            int len = 13;
+            int len = 18;
             ImagePoint[] toTest = new ImagePoint[len];
             var positionsAvailable = GetNewAvailablePositionTypes();
             for (int i = 0; i < len; i++)

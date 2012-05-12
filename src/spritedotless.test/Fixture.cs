@@ -92,7 +92,8 @@ namespace spritedotless.test
             {
                 returner.Add(new SpriteAssertion() {
                     File = string.Format("test{0}.png", imagePoint.ImageNumber),
-                    Position = imagePoint.Position
+                    Position = imagePoint.Position,
+                    PositionType = imagePoint.PositionType
                 });
             }
             return returner;
@@ -287,6 +288,7 @@ namespace spritedotless.test
         {
             public Point Position { get; set; }
             public string File { get; set; }
+            public PositionType PositionType { get; set; }
         }
 
         protected void AssertLessAndPositions(string input, string expected, IDictionary<string, IList<SpriteAssertion>> imageAssertions)
@@ -351,21 +353,62 @@ namespace spritedotless.test
                         combinedBitmap.Width, combinedBitmap.Height));
                 }
 
+                int repeatXCount = 1, repeatYCount = 1;
+
+                if (spriteAssertion.PositionType == PositionType.Vertical)
+                {
+                    Assert.AreEqual(0, combinedBitmap.Height % spriteImage.Height);
+
+                    repeatYCount = combinedBitmap.Height / spriteImage.Height;
+                }
+                else if (spriteAssertion.PositionType == PositionType.Horizontal)
+                {
+                    Assert.AreEqual(0, combinedBitmap.Width % spriteImage.Width);
+
+                    repeatXCount = combinedBitmap.Width / spriteImage.Width;
+                }
+
+                if ((spriteAssertion.PositionType & (PositionType.Top | PositionType.Vertical)) > 0)
+                {
+                    Assert.AreEqual(0, spriteAssertion.Position.Y);
+                }
+
+                if ((spriteAssertion.PositionType & (PositionType.Left | PositionType.Horizontal)) > 0)
+                {
+                    Assert.AreEqual(0, spriteAssertion.Position.X);
+                }
+
+                if ((spriteAssertion.PositionType & (PositionType.Right)) > 0)
+                {
+                    Assert.AreEqual(combinedBitmap.Width - spriteImage.Width, spriteAssertion.Position.X);
+                }
+
+                if ((spriteAssertion.PositionType & (PositionType.Bottom)) > 0)
+                {
+                    Assert.AreEqual(combinedBitmap.Height - spriteImage.Height, spriteAssertion.Position.Y);
+                }
+
                 using (Bitmap spriteBitmap = new Bitmap(spriteImage))
                 {
-                    for (int x = 0; x < spriteBitmap.Width; x++)
+                    for (int repeatY = 0; repeatY < repeatYCount; repeatY++)
                     {
-                        for (int y = 0; y < spriteBitmap.Height; y++)
+                        for (int repeatX = 0; repeatX < repeatXCount; repeatX++)
                         {
-                            int xPos = x + spriteAssertion.Position.X,
-                                yPos = y + spriteAssertion.Position.Y;
-
-                            if (!spriteBitmap.GetPixel(x, y).Equals(
-                                combinedBitmap.GetPixel(xPos, yPos)))
+                            for (int x = 0; x < spriteBitmap.Width; x++)
                             {
-                                throw new Exception(String.Format("Sprite assertion {0} - {1},{2} is not in the right position",
-                                    spriteAssertion.File, spriteAssertion.Position.X, spriteAssertion.Position.Y));
+                                for (int y = 0; y < spriteBitmap.Height; y++)
+                                {
+                                    int xPos = x + spriteAssertion.Position.X + (repeatX * spriteImage.Width),
+                                        yPos = y + spriteAssertion.Position.Y + (repeatY * spriteImage.Height);
 
+                                    if (!spriteBitmap.GetPixel(x, y).Equals(
+                                        combinedBitmap.GetPixel(xPos, yPos)))
+                                    {
+                                        throw new Exception(String.Format("Sprite assertion {0} - {1},{2} is not in the right position",
+                                            spriteAssertion.File, spriteAssertion.Position.X, spriteAssertion.Position.Y));
+
+                                    }
+                                }
                             }
                         }
                     }

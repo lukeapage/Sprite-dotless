@@ -65,11 +65,19 @@ namespace spritedotless
             _image = Image.FromFile(Filename);
         }
 
-        public void DrawOnTo(Graphics bitmap)
+        public void DrawOnTo(Graphics bitmap, Size totalSize)
         {
-            bitmap.DrawImage(Image, Position);
-        }
+            int repeatXCount = PositionType == PositionType.Horizontal ? totalSize.Width / Size.Width : 1,
+                repeatYCount = PositionType == PositionType.Vertical ? totalSize.Height / Size.Height : 1;
 
+            for (int repeatX = 0; repeatX < repeatXCount; repeatX++)
+            {
+                for (int repeatY = 0; repeatY < repeatYCount; repeatY++)
+                {
+                    bitmap.DrawImage(Image, Position.X + (repeatX * Size.Width), Position.Y + (repeatY * Size.Height));
+                }
+            }
+        }
 
         #region IDisposable Members
 
