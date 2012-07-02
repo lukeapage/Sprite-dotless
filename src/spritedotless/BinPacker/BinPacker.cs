@@ -226,6 +226,16 @@ namespace spritedotless.BinPacker
 
             if (candidateEmpties.Count == 0)
             {
+                if (lastSpace == null)
+                {
+                    Logger.Log("Unable to find space");
+#if DEBUG
+                    throw new Exception("Unable to find space");
+#else
+                    return null;
+#endif
+                }
+
                 Logger.Log("No emtpies found, Will have to increase sprite size... Last space @ {0} x {1}. Size = {2} x {3}", lastSpace.EmptySpace.X, lastSpace.EmptySpace.Y, lastSpace.EmptySpace.Width, lastSpace.EmptySpace.Height);
 
                 emptySpaces.IncreaseSizes(
@@ -282,7 +292,7 @@ namespace spritedotless.BinPacker
                 offsetX = candidateEmpties[0].ExcessWidth;
             }
 
-            Logger.Log("Best space found at {0} x {1}", candidateEmpties[0].EmptySpace.X, candidateEmpties[0].EmptySpace.Y);
+            Logger.Log("Best space {0} found at {1} x {2}", candidateEmpties[0].EmptySpace.EmptySpaceNo, candidateEmpties[0].EmptySpace.X, candidateEmpties[0].EmptySpace.Y);
 
             PositionSetter returner = new PositionSetter(sprite, new Point(candidateEmpties[0].EmptySpace.X + offsetX, candidateEmpties[0].EmptySpace.Y + offsetY), size);
 

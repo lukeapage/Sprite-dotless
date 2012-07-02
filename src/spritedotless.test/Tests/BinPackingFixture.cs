@@ -643,11 +643,13 @@ namespace spritedotless.test.Tests
             if (positionType == PositionType.Vertical)
             {
                 available.Remove(PositionType.Horizontal);
+                available.Remove(PositionType.Vertical); // Can't verify the images will fit inside each other
             }
 
             if (positionType == PositionType.Horizontal)
             {
                 available.Remove(PositionType.Vertical);
+                available.Remove(PositionType.Horizontal); // Can't verify the images will fit inside each other
             }
 
             if (positionType == PositionType.TopLeft || positionType == PositionType.TopRight || positionType == PositionType.BottomRight || positionType == PositionType.BottomLeft)
@@ -709,17 +711,81 @@ namespace spritedotless.test.Tests
         }
 
         [Test]
+        public void TestThirty()
+        {
+            // idcvzzzwwwww       sppp bbb  d
+            // gdcvzzz            s    bbb  d
+            // mdcvzzz            s    bbb  d
+            //  dcv               s    bbb  b
+            //  dc                     bbb  b
+            //  dc                     bbb  b
+            //  dc                     bbb  b
+            //  d                      bbb  b
+            // aaa                     bbb  b
+            // aaa                     bbbyyy
+            // aaa         u           bbbyyy
+            // oo          u           bbbyyy
+            // oo          uc          bbb qq
+            //             ucxxxet     bbb   
+            // n   aaaaaaklucxxxetrrfj bbb  h
+
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 1, Position = new Point(0, 128), PositionType = PositionType.Left }, // aa 48x48
+                new ImagePoint() { ImageNumber = 2, Position = new Point(384, 0), PositionType = PositionType.Vertical }, // ab 48x48
+                new ImagePoint() { ImageNumber = 3, Position = new Point(208, 192), PositionType = PositionType.Bottom }, // ac 16x48
+                new ImagePoint() { ImageNumber = 4, Position = new Point(464, 0), PositionType = PositionType.TopRight }, // ad 16x48
+                new ImagePoint() { ImageNumber = 5, Position = new Point(272, 208), PositionType = PositionType.Bottom }, // ae 16x32
+                new ImagePoint() { ImageNumber = 6, Position = new Point(336, 224), PositionType = PositionType.Bottom }, // af 16x16
+                new ImagePoint() { ImageNumber = 7, Position = new Point(0, 16), PositionType = PositionType.Left }, // ag 16x16
+                new ImagePoint() { ImageNumber = 8, Position = new Point(464, 224), PositionType = PositionType.BottomRight }, // ah 16x16
+                new ImagePoint() { ImageNumber = 9, Position = new Point(0, 0), PositionType = PositionType.TopLeft }, // ai 16x16
+                new ImagePoint() { ImageNumber = 10, Position = new Point(352, 224), PositionType = PositionType.Bottom }, // aj 16x16
+                new ImagePoint() { ImageNumber = 11, Position = new Point(160, 224), PositionType = PositionType.Bottom }, // ak 16x16
+                new ImagePoint() { ImageNumber = 12, Position = new Point(176, 224), PositionType = PositionType.Bottom }, // al 16x16
+                new ImagePoint() { ImageNumber = 13, Position = new Point(0, 32), PositionType = PositionType.Left }, // am 16x16
+                new ImagePoint() { ImageNumber = 14, Position = new Point(0, 224), PositionType = PositionType.BottomLeft }, // an 16x16
+                new ImagePoint() { ImageNumber = 15, Position = new Point(0, 176), PositionType = PositionType.Left }, // ao 32x32
+                new ImagePoint() { ImageNumber = 16, Position = new Point(320, 0), PositionType = PositionType.Anywhere }, // ap 48x16
+                new ImagePoint() { ImageNumber = 17, Position = new Point(448, 192), PositionType = PositionType.Right }, // aq 32x16
+                new ImagePoint() { ImageNumber = 18, Position = new Point(304, 224), PositionType = PositionType.Bottom }, // ar 32x16
+                new ImagePoint() { ImageNumber = 19, Position = new Point(304, 0), PositionType = PositionType.Anywhere }, // as 16x64
+                new ImagePoint() { ImageNumber = 20, Position = new Point(288, 208), PositionType = PositionType.Bottom }, // at 16x32
+                new ImagePoint() { ImageNumber = 21, Position = new Point(192, 160), PositionType = PositionType.Bottom }, // au 16x80
+                new ImagePoint() { ImageNumber = 22, Position = new Point(48, 0), PositionType = PositionType.Top }, // av 16x64
+                new ImagePoint() { ImageNumber = 23, Position = new Point(112, 0), PositionType = PositionType.Top }, // aw 80x16
+                new ImagePoint() { ImageNumber = 24, Position = new Point(224, 208), PositionType = PositionType.Bottom }, // ax 48x32
+                new ImagePoint() { ImageNumber = 25, Position = new Point(432, 144), PositionType = PositionType.Right }, // ay 48x48
+                new ImagePoint() { ImageNumber = 26, Position = new Point(64, 0), PositionType = PositionType.Top }, // az 48x48
+                new ImagePoint() { ImageNumber = 27, Position = new Point(64, 224), PositionType = PositionType.Bottom }, // ba 96x16
+                new ImagePoint() { ImageNumber = 28, Position = new Point(464, 48), PositionType = PositionType.Right }, // bb 16x96
+                new ImagePoint() { ImageNumber = 29, Position = new Point(32, 0), PositionType = PositionType.Top }, // bc 16x112
+                new ImagePoint() { ImageNumber = 30, Position = new Point(16, 0), PositionType = PositionType.Top }); // bd 16x128
+        }
+
+        [Test]
+        public void RandomFailing4()
+        {
+                DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 1, Position = new Point(0, 128), PositionType = PositionType.Left }, // aa 48x48
+                    new ImagePoint() { ImageNumber = 2, Position = new Point(384, 0), PositionType = PositionType.Vertical }, // ab 48x48
+                    new ImagePoint() { ImageNumber = 3, Position = new Point(208, 192), PositionType = PositionType.Bottom }, // ac 16x48
+                    new ImagePoint() { ImageNumber = 4, Position = new Point(464, 0), PositionType = PositionType.TopRight }, // ad 16x48
+                    new ImagePoint() { ImageNumber = 5, Position = new Point(272, 208), PositionType = PositionType.Bottom }); // ae 16x32
+        }
+
+        [Test]
         public void RandomLotsOfImages()
         {
-            int len = 18;
-            ImagePoint[] toTest = new ImagePoint[len];
-            var positionsAvailable = GetNewAvailablePositionTypes();
-            for (int i = 0; i < len; i++)
+            int len = 5;
+            for (int testRun = 0; testRun < 1000; testRun++)
             {
-                toTest[i] = new ImagePoint() { ImageNumber = i + 1, PositionType = RandomPositionType(positionsAvailable) };
-            }
+                ImagePoint[] toTest = new ImagePoint[len];
+                var positionsAvailable = GetNewAvailablePositionTypes();
+                for (int i = 0; i < len; i++)
+                {
+                    toTest[i] = new ImagePoint() { ImageNumber = i + 1, PositionType = RandomPositionType(positionsAvailable) };
+                }
 
-            DoTestJustNoOverlap(toTest);
+                DoTestJustNoOverlap(toTest);
+            }
         }
 
         [Test]

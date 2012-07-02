@@ -108,7 +108,7 @@ namespace spritedotless.BinPacker
         {
             Remove(candidate.EmptySpace);
 
-            FillUpSpace(candidate.EmptySpace, mode, candidate.PositionType, candidate.ImageWidth, candidate.ImageHeight, offsetX, offsetY);
+            FillUpSpace(candidate.EmptySpace, mode, candidate.PositionType, candidate.ImageWidth, candidate.ImageHeight, false, offsetX, offsetY);
 
             List<Action> actions = new List<Action>();
 
@@ -128,6 +128,7 @@ namespace spritedotless.BinPacker
                             candidate.PositionType,
                             imageWidth,
                             imageHeight,
+                            true,
                             imageX - possibleIntersection.X,
                             imageY - possibleIntersection.Y));
 
@@ -142,6 +143,7 @@ namespace spritedotless.BinPacker
                             candidate.PositionType,
                             imageWidth - (imageX < possibleIntersection.X ? possibleIntersection.X - imageX : 0),
                             imageHeight - (imageY < possibleIntersection.Y ? possibleIntersection.Y - imageY : 0),
+                            true,
                             imageX > possibleIntersection.X ? imageX - possibleIntersection.X : 0,
                             imageY > possibleIntersection.Y ? imageY - possibleIntersection.Y : 0));
 
@@ -160,6 +162,7 @@ namespace spritedotless.BinPacker
                             candidate.PositionType,
                             possibleIntersection.Width,
                             imageHeight,
+                            true,
                             0, //possibleIntersection.X - imageX,
                             imageY - possibleIntersection.Y));
 
@@ -177,6 +180,7 @@ namespace spritedotless.BinPacker
                             candidate.PositionType,
                             imageWidth,
                             possibleIntersection.Height,
+                            true,
                             imageX - possibleIntersection.X,
                             0));
                 }
@@ -189,13 +193,13 @@ namespace spritedotless.BinPacker
             }
         }
 
-        private Action CapturedFillUpSpace(EmptySpace possibleIntersection, BinPackingMode mode, PositionType positionType, int width, int height, int x, int y)
+        private Action CapturedFillUpSpace(EmptySpace possibleIntersection, BinPackingMode mode, PositionType positionType, int width, int height, bool isSecondary, int x, int y)
         {
             return () =>
             {
                 Remove(possibleIntersection);
 
-                FillUpSpace(possibleIntersection, mode, positionType, width, height, x, y);
+                FillUpSpace(possibleIntersection, mode, positionType, width, height, isSecondary, x, y);
             };
         }
 
@@ -213,10 +217,12 @@ namespace spritedotless.BinPacker
                     ry + rh > y;
         }
 
-        private void FillUpSpace(EmptySpace emptySpace, BinPackingMode mode, PositionType positionType, int imageWidth, int imageHeight, int offsetX = 0, int offsetY = 0)
+        private void FillUpSpace(EmptySpace emptySpace, BinPackingMode mode, PositionType positionType, int imageWidth, int imageHeight, bool isSecondary, int offsetX = 0, int offsetY = 0)
         {
-            Logger.Log("Filling up space [{0}x{1} size={2},{3}] at [{4},{5}] for [size= {6},{7}]", emptySpace.X, emptySpace.Y, emptySpace.Width, emptySpace.Height, 
+            Logger.Log("Filling up space {0} [{1}x{2} size={3},{4}] at [{5},{6}] for [size= {7},{8}]", emptySpace.EmptySpaceNo, emptySpace.X, emptySpace.Y, emptySpace.Width, emptySpace.Height, 
                 offsetX, offsetY, imageWidth, imageHeight);
+
+            EmptySpace newSpace;
 
             // image might be spanned across empty spaces.. for our purposes make sure we only consider the bit in this space
             if (imageWidth + offsetX > emptySpace.Width)
@@ -231,90 +237,110 @@ namespace spritedotless.BinPacker
 
             if (offsetX > 0)
             {
-                Logger.Log("Adding space on the left");
-
-                Add(new EmptySpace()
+                newSpace = new EmptySpace()
                 {
                     X = emptySpace.X,
                     Y = emptySpace.Y,
                     Width = offsetX,
                     Height = emptySpace.Height
-                });
+                };
+
+                Logger.Log("Adding space {0} on the left", newSpace.EmptySpaceNo);
+
+                Add(newSpace);
             }
 
             if (offsetY > 0)
             {
-                Logger.Log("Adding space on the top");
-
-                Add(new EmptySpace()
+                newSpace = new EmptySpace()
                 {
                     X = emptySpace.X,
                     Y = emptySpace.Y,
                     Width = emptySpace.Width,
                     Height = offsetY
-                });
+                };
+
+                Logger.Log("Adding space {0} on the top", newSpace.EmptySpaceNo);
+
+                Add(newSpace);
             }
 
             int excessWidth = emptySpace.Width - (imageWidth + offsetX),
                 excessHeight = emptySpace.Height - (imageHeight + offsetY);
 
-            if (excessWidth > 0 || (mode == BinPackingMode.Horizontal && (emptySpace.X + emptySpace.Width == this.Width)))
+            if (excessWidth > 0 || (mode == BinPackingMode.Horizontal && !isSecondary))
+                //&& (emptySpace.X + emptySpace.Width == this.Width)))
+                // We did attempt to only add space if there wasn't one already, the trouble is that
+                // if something is anchored right then this expression will be false, but there will be no
+                // inserted empty space
             {
                 if ((positionType & PositionType.Right) > 0 && mode == BinPackingMode.Horizontal)
                 {
                     if (offsetX == 0)
                     {
-                        Logger.Log("Adding 0 width space on the left");
-
-                        Add(new EmptySpace()
+                        newSpace = new EmptySpace()
                         {
                             X = emptySpace.X,
                             Y = emptySpace.Y,
                             Width = 0,
                             Height = emptySpace.Height
-                        });
+                        };
+
+                        Logger.Log("Adding 0 width space {0} on the left", newSpace.EmptySpaceNo);
+
+                        Add(newSpace);
                     }
                 } else if (positionType != PositionType.Horizontal)
                 {
-                    Logger.Log("Adding space on the right");
-
-                    Add(new EmptySpace()
+                    newSpace = new EmptySpace()
                     {
                         X = emptySpace.X + imageWidth + offsetX,
                         Y = emptySpace.Y,
                         Width = excessWidth,
                         Height = emptySpace.Height
-                    });
+                    };
+
+                    Logger.Log("Adding space {0} on the right", newSpace.EmptySpaceNo);
+
+                    Add(newSpace);
                 }
             }
 
-            if (excessHeight > 0 || (mode == BinPackingMode.Vertical && (emptySpace.Y + emptySpace.Height == this.Height)))
+            if (excessHeight > 0 || (mode == BinPackingMode.Vertical && !isSecondary))
+                // && (emptySpace.Y + emptySpace.Height == this.Height)))
+                // We did attempt to only add space if there wasn't one already, the trouble is that
+                // if something is anchored bottom then this expression will be false, but there will be no
+                // inserted empty space
             {
                 if ((positionType & PositionType.Bottom) > 0 && mode == BinPackingMode.Vertical)
                 {
                     if (offsetY == 0)
                     {
-                        Logger.Log("Adding 0 space on the top");
-
-                        Add(new EmptySpace()
+                        newSpace = new EmptySpace()
                         {
                             X = emptySpace.X,
                             Y = emptySpace.Y,
                             Width = emptySpace.Width,
                             Height = 0
-                        });
+                        };
+
+                        Logger.Log("Adding 0 space {0} on the top", newSpace.EmptySpaceNo);
+
+                        Add(newSpace);
                     }
                 } else if (positionType != PositionType.Vertical)
                 {
-                    Logger.Log("Adding space on the bottom");
-
-                    Add(new EmptySpace()
+                    newSpace = new EmptySpace()
                     {
                         X = emptySpace.X,
                         Y = emptySpace.Y + imageHeight + offsetY,
                         Width = emptySpace.Width,
                         Height = excessHeight
-                    });
+                    };
+
+                    Logger.Log("Adding space {0} on the bottom", newSpace.EmptySpaceNo);
+
+                    Add(newSpace);
                 }
             }
         }
