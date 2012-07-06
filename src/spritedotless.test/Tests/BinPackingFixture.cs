@@ -772,9 +772,16 @@ namespace spritedotless.test.Tests
         }
 
         [Test]
+        public void RandomFailing5()
+        {
+            DoTestJustNoOverlap(new ImagePoint() { ImageNumber = 3, Position = new Point(0, 128), PositionType = PositionType.Top },
+                new ImagePoint() { ImageNumber =1, Position = new Point(384, 0), PositionType = PositionType.Left });
+        }
+
+        [Test]
         public void RandomLotsOfImages()
         {
-            int len = 5;
+            int len = 3;
             for (int testRun = 0; testRun < 1000; testRun++)
             {
                 ImagePoint[] toTest = new ImagePoint[len];

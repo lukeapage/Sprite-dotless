@@ -115,17 +115,48 @@ namespace spritedotless.BinPacker
             int imageX = candidate.EmptySpace.X + offsetX,
                 imageY = candidate.EmptySpace.Y + offsetY,
                 imageWidth = candidate.ImageWidth,
-                imageHeight = candidate.ImageHeight;
+                imageHeight = candidate.ImageHeight,
+                intersectOffsetX, intersectOffsetY, 
+                intersectWidth, intersectHeight;
+
+            // for the purposes of intersections..
+            // left||Horizontal -> imageX = -1
+            // top||Vertical -> imageY = -1
+            // 
+            /*
+            if ((candidate.PositionType & (PositionType.Left | PositionType.Horizontal)) > 0)
+            {
+                imageX = -1;
+            }
+
+            if ((candidate.PositionType & (PositionType.Top | PositionType.Vertical)) > 0)
+            {
+                imageY = -1;
+            }
+
+            if ((candidate.PositionType & (PositionType.Right | PositionType.Horizontal)) > 0)
+            {
+                imageWidth = int.MaxValue;
+            }
+
+            if ((candidate.PositionType & (PositionType.Bottom | PositionType.Vertical)) > 0)
+            {
+                imageHeight = int.MaxValue;
+            }
+            */
+            Logger.Indent();
 
             foreach (EmptySpace possibleIntersection in this)
             {
                 // top left of image inside empty space..
                 if (PointInRect(imageX, imageY, possibleIntersection.X, possibleIntersection.Y, possibleIntersection.Width, possibleIntersection.Height))
                 {
+                    Logger.Log("Top left of filled image is inside of {0}", possibleIntersection.EmptySpaceNo);
+
                     actions.Add(CapturedFillUpSpace(
                             possibleIntersection,
                             mode,
-                            candidate.PositionType,
+                            PositionType.Anywhere,
                             imageWidth,
                             imageHeight,
                             true,
@@ -136,11 +167,12 @@ namespace spritedotless.BinPacker
                 }
                 else if (PointInRect(imageX + imageWidth - 1, imageY + imageHeight - 1, possibleIntersection.X, possibleIntersection.Y, possibleIntersection.Width, possibleIntersection.Height))
                 {
+                    Logger.Log("Bottom right of filled image is inside of {0}", possibleIntersection.EmptySpaceNo);
 
                     actions.Add(CapturedFillUpSpace(
                             possibleIntersection,
                             mode,
-                            candidate.PositionType,
+                            PositionType.Anywhere,
                             imageWidth - (imageX < possibleIntersection.X ? possibleIntersection.X - imageX : 0),
                             imageHeight - (imageY < possibleIntersection.Y ? possibleIntersection.Y - imageY : 0),
                             true,
@@ -155,11 +187,12 @@ namespace spritedotless.BinPacker
                   possibleIntersection.Y + possibleIntersection.Height > imageY + imageHeight
                   )
                 {
+                    Logger.Log("the empty space {0} - width is entirely inside the image", possibleIntersection.EmptySpaceNo);
 
                     actions.Add(CapturedFillUpSpace(
                             possibleIntersection,
                             mode,
-                            candidate.PositionType,
+                            PositionType.Anywhere,
                             possibleIntersection.Width,
                             imageHeight,
                             true,
@@ -174,16 +207,155 @@ namespace spritedotless.BinPacker
                   possibleIntersection.Y >= imageY &&
                   possibleIntersection.Y + possibleIntersection.Height < imageY + imageHeight)
                 {
+                    Logger.Log("the empty space {0} - height is entirely inside the image", possibleIntersection.EmptySpaceNo);
+
                     actions.Add(CapturedFillUpSpace(
                             possibleIntersection,
                             mode,
-                            candidate.PositionType,
+                            PositionType.Anywhere,
                             imageWidth,
                             possibleIntersection.Height,
                             true,
                             imageX - possibleIntersection.X,
                             0));
                 }
+                        // if its left/horizontal
+                else if ((candidate.PositionType & (PositionType.Left | PositionType.Horizontal)) > 0 &&
+                        // is left of the image and is not
+                    possibleIntersection.X <= imageX && !(
+                        // above or below the image
+                        possibleIntersection.Y + possibleIntersection.Height <= imageY ||
+                        possibleIntersection.Y >= imageY + imageHeight
+                    ))
+                {
+                    Logger.Log("the empty space {0} is left of a left or horizontal", possibleIntersection.EmptySpaceNo);
+
+                    intersectOffsetY = 0;
+                    if (possibleIntersection.Y > imageY)
+                    {
+                        intersectOffsetY = possibleIntersection.Y - imageY;
+                    }
+
+                    intersectHeight = possibleIntersection.Height - intersectOffsetY;
+
+                    if (possibleIntersection.Y + possibleIntersection.Height > imageY + imageHeight)
+                    {
+                        intersectHeight -= (possibleIntersection.Y + possibleIntersection.Height) - (imageY + imageHeight);
+                    }
+
+                    actions.Add(CapturedFillUpSpace(
+                        possibleIntersection,
+                        mode,
+                        PositionType.Anywhere,
+                        possibleIntersection.Width,
+                        intersectHeight,
+                        true,
+                        0,
+                        intersectOffsetY
+                        ));
+                }                         // if its top/vertical
+                else if ((candidate.PositionType & (PositionType.Top | PositionType.Vertical)) > 0 &&
+                    // is top of the image and is not
+                    possibleIntersection.Y <= imageY && !(
+                    // above or below the image
+                        possibleIntersection.X + possibleIntersection.Width <= imageX ||
+                        possibleIntersection.X >= imageX + imageWidth
+                    ))
+                {
+                    Logger.Log("the empty space {0} is above of a top or vertical", possibleIntersection.EmptySpaceNo);
+
+                    intersectOffsetX = 0;
+                    if (possibleIntersection.X > imageX)
+                    {
+                        intersectOffsetY = possibleIntersection.X - imageX;
+                    }
+
+                    intersectWidth = possibleIntersection.Width - intersectOffsetX;
+
+                    if (possibleIntersection.X + possibleIntersection.Width > imageX + imageWidth)
+                    {
+                        intersectWidth -= (possibleIntersection.X + possibleIntersection.Width) - (imageX + imageWidth);
+                    }
+
+                    actions.Add(CapturedFillUpSpace(
+                        possibleIntersection,
+                        mode,
+                        PositionType.Anywhere,
+                        intersectWidth,
+                        possibleIntersection.Height,
+                        true,
+                        intersectOffsetX,
+                        0
+                        ));
+                }
+                else if ((candidate.PositionType & (PositionType.Right | PositionType.Horizontal)) > 0 &&
+                                        // is right of the image and is not
+                       possibleIntersection.X > imageX && !(
+                                        // above or below the image
+                           possibleIntersection.Y + possibleIntersection.Height <= imageY ||
+                           possibleIntersection.Y >= imageY + imageHeight
+                       ))
+                {
+                    Logger.Log("the empty space {0} is right of a right or horizontal", possibleIntersection.EmptySpaceNo);
+
+                    intersectOffsetY = 0;
+                    if (possibleIntersection.Y > imageY)
+                    {
+                        intersectOffsetY = possibleIntersection.Y - imageY;
+                    }
+
+                    intersectHeight = possibleIntersection.Height - intersectOffsetY;
+
+                    if (possibleIntersection.Y + possibleIntersection.Height > imageY + imageHeight)
+                    {
+                        intersectHeight -= (possibleIntersection.Y + possibleIntersection.Height) - (imageY + imageHeight);
+                    }
+
+                    actions.Add(CapturedFillUpSpace(
+                        possibleIntersection,
+                        mode,
+                        PositionType.Anywhere,
+                        possibleIntersection.Width,
+                        intersectHeight,
+                        true,
+                        0,
+                        intersectOffsetY
+                        ));
+                }
+                else if ((candidate.PositionType & (PositionType.Bottom | PositionType.Vertical)) > 0 &&
+                                            // is below of the image and is not
+                             possibleIntersection.Y > imageY && !(
+                                            // left or right the image
+                                 possibleIntersection.X + possibleIntersection.Width <= imageX ||
+                                 possibleIntersection.X >= imageX + imageWidth
+                             ))
+                {
+                    Logger.Log("the empty space {0} is below of a bottom or vertical", possibleIntersection.EmptySpaceNo);
+
+                    intersectOffsetX = 0;
+                    if (possibleIntersection.X > imageX)
+                    {
+                        intersectOffsetX = possibleIntersection.X - imageX;
+                    }
+
+                    intersectWidth = possibleIntersection.Width - intersectOffsetX;
+
+                    if (possibleIntersection.Y + possibleIntersection.Height > imageY + imageHeight)
+                    {
+                        intersectWidth -= (possibleIntersection.X + possibleIntersection.Width) - (imageX + imageWidth);
+                    }
+
+                    actions.Add(CapturedFillUpSpace(
+                        possibleIntersection,
+                        mode,
+                        PositionType.Anywhere,
+                        intersectWidth,
+                        possibleIntersection.Height,
+                        true,
+                        intersectOffsetX,
+                        0
+                        ));
+                }  
             }
 
             // remove all the intersections
@@ -191,6 +363,8 @@ namespace spritedotless.BinPacker
             {
                 action();
             }
+
+            Logger.UnIndent();
         }
 
         private Action CapturedFillUpSpace(EmptySpace possibleIntersection, BinPackingMode mode, PositionType positionType, int width, int height, bool isSecondary, int x, int y)
@@ -274,7 +448,7 @@ namespace spritedotless.BinPacker
                 // if something is anchored right then this expression will be false, but there will be no
                 // inserted empty space
             {
-                if ((positionType & PositionType.Right) > 0 && mode == BinPackingMode.Horizontal)
+                if ((positionType & (PositionType.Left | PositionType.Horizontal)) == 0 && mode == BinPackingMode.Horizontal && !isSecondary)
                 {
                     if (offsetX == 0)
                     {
@@ -290,7 +464,8 @@ namespace spritedotless.BinPacker
 
                         Add(newSpace);
                     }
-                } else if (positionType != PositionType.Horizontal)
+                }
+                if ((positionType & (PositionType.Horizontal | PositionType.Right)) == 0)
                 {
                     newSpace = new EmptySpace()
                     {
@@ -312,7 +487,7 @@ namespace spritedotless.BinPacker
                 // if something is anchored bottom then this expression will be false, but there will be no
                 // inserted empty space
             {
-                if ((positionType & PositionType.Bottom) > 0 && mode == BinPackingMode.Vertical)
+                if ((positionType & (PositionType.Top | PositionType.Vertical)) == 0 && mode == BinPackingMode.Vertical && !isSecondary)
                 {
                     if (offsetY == 0)
                     {
@@ -328,7 +503,8 @@ namespace spritedotless.BinPacker
 
                         Add(newSpace);
                     }
-                } else if (positionType != PositionType.Vertical)
+                }
+                if ((positionType & (PositionType.Bottom | PositionType.Vertical)) == 0)
                 {
                     newSpace = new EmptySpace()
                     {
@@ -399,8 +575,9 @@ namespace spritedotless.BinPacker
                 // purposefully excludes horizontal and vertical positioned sprites
                 foreach (PositionSetter posSetter in positionDecidedImages.Where(
                     (positionDecidedImage) => 
-                        (positionDecidedImage.SpriteImage.PositionType & PositionType.Right) > 0 ||
-                        positionDecidedImage.Position.X >= moveIncreaseBoundaryX))
+                        ((positionDecidedImage.SpriteImage.PositionType & PositionType.Right) > 0 ||
+                        positionDecidedImage.Position.X >= moveIncreaseBoundaryX) &&
+                        positionDecidedImage.SpriteImage.PositionType != PositionType.Horizontal))
                 {
                     if ((posSetter.SpriteImage.PositionType & PositionType.Right) > 0)
                     {
@@ -443,8 +620,9 @@ namespace spritedotless.BinPacker
 
                 // purposefully excludes horizontal and vertical positioned sprites
                 foreach (PositionSetter posSetter in positionDecidedImages.Where(
-                    (positionDecidedImage) => (positionDecidedImage.SpriteImage.PositionType & PositionType.Bottom) > 0 ||
-                        positionDecidedImage.Position.Y >= moveIncreaseBoundaryY))
+                    (positionDecidedImage) => ((positionDecidedImage.SpriteImage.PositionType & PositionType.Bottom) > 0 ||
+                        positionDecidedImage.Position.Y >= moveIncreaseBoundaryY) 
+                        && positionDecidedImage.SpriteImage.PositionType != PositionType.Vertical))
                 {
                     if ((posSetter.SpriteImage.PositionType & PositionType.Bottom) > 0)
                     {
