@@ -21,7 +21,13 @@ namespace spritedotless.test
     /// </summary>
     public class SpriteFixture : SpecFixtureBase
     {
-        protected Random _rand = new Random(301082);
+        protected Random _rand;
+
+        [SetUp]
+        protected void ResetRandomSeed()
+        {
+            _rand = new Random(301082);
+        }
 
         [SetUp]
         public new void SetupParser()

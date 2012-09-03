@@ -779,7 +779,7 @@ namespace spritedotless.test.Tests
         }
 
         [Test]
-        public void RandomLotsOfImages()
+        public void RandomLotsOfImages1000x3()
         {
             int len = 3;
             for (int testRun = 0; testRun < 1000; testRun++)
@@ -794,6 +794,24 @@ namespace spritedotless.test.Tests
                 DoTestJustNoOverlap(toTest);
             }
         }
+
+        [Test]
+        public void RandomLotsOfImages1000x4()
+        {
+            int len = 4;
+            for (int testRun = 0; testRun < 1000; testRun++)
+            {
+                ImagePoint[] toTest = new ImagePoint[len];
+                var positionsAvailable = GetNewAvailablePositionTypes();
+                for (int i = 0; i < len; i++)
+                {
+                    toTest[i] = new ImagePoint() { ImageNumber = i + 1, PositionType = RandomPositionType(positionsAvailable) };
+                }
+
+                DoTestJustNoOverlap(toTest);
+            }
+        }
+
 
         [Test]
         public void DuplicateEmptyCreatedDoWeMatchAndRemove()
