@@ -12,15 +12,15 @@ namespace spritedotless.test.Tests
         [Test]
         public void SimpleTwoImages()
         {
-            DoTest(new ImagePoint() { ImageNumber = 1, Position = new Point(0, 0) },
-                new ImagePoint() { ImageNumber = 2, Position = new Point(48, 0) });
+            DoTest(new ImagePoint() { ImageNumber = 1, Position = new Point(48, 0) },
+                new ImagePoint() { ImageNumber = 2, Position = new Point(0, 0) });
         }
 
         [Test]
         public void SimpleTwoImagesTop()
         {
-            DoTest(new ImagePoint() { ImageNumber = 1, Position = new Point(48, 0) },
-                new ImagePoint() { ImageNumber = 2, Position = new Point(0, 0), PositionType = PositionType.Top });
+            DoTest(new ImagePoint() { ImageNumber = 1, Position = new Point(0, 0) },
+                new ImagePoint() { ImageNumber = 2, Position = new Point(48, 0), PositionType = PositionType.Top });
         }
 
         [Test]
