@@ -12,6 +12,11 @@ namespace spritedotless.BinPacker
             EmptySpaceNo = EmptySpaceCounter++;
         }
 
+        public static void ResetCounter()
+        {
+            EmptySpaceCounter = 1;
+        }
+
         public int X { get; set; }
         public int Y { get; set; }
         public int Width { get; set; }

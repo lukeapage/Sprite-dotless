@@ -9,6 +9,11 @@ namespace spritedotless
     {
         private static int _tab = 0;
 
+        public static void ResetEmptySpaceCounter()
+        {
+            spritedotless.BinPacker.EmptySpace.ResetCounter();
+        }
+
         public static void Indent()
         {
             _tab += 2;

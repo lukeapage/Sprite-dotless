@@ -792,6 +792,7 @@ namespace spritedotless.test.Tests
                 }
 
                 DoTestJustNoOverlap(toTest);
+                Logger.ResetEmptySpaceCounter();
             }
         }
 
@@ -809,6 +810,7 @@ namespace spritedotless.test.Tests
                 }
 
                 DoTestJustNoOverlap(toTest);
+                Logger.ResetEmptySpaceCounter();
             }
         }
 

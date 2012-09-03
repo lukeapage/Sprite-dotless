@@ -27,6 +27,7 @@ namespace spritedotless.test
         protected void ResetRandomSeed()
         {
             _rand = new Random(301082);
+            Logger.ResetEmptySpaceCounter();
         }
 
         [SetUp]
