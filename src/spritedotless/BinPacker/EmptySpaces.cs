@@ -205,9 +205,15 @@ namespace spritedotless.BinPacker
                 else if (possibleIntersection.X <= imageX &&
                   possibleIntersection.X + possibleIntersection.Width > imageX + imageWidth &&
                   possibleIntersection.Y >= imageY &&
-                  possibleIntersection.Y + possibleIntersection.Height < imageY + imageHeight)
+                  possibleIntersection.Y + possibleIntersection.Height < imageY + imageHeight &&
+                    !(possibleIntersection.Y == imageY && possibleIntersection.Height == 0) &&
+                    !(possibleIntersection.X == imageX && possibleIntersection.Width == 0))
                 {
                     Logger.Log("the empty space {0} - height is entirely inside the image", possibleIntersection.EmptySpaceNo);
+                    Logger.Log("X {0} <= imageX {1} && X+W {2} > {3} && Y {4} >= {5} && Y+H {6} < {7}", possibleIntersection.X, imageX,
+                        possibleIntersection.X + possibleIntersection.Width, imageX + imageWidth,
+                        possibleIntersection.Y, imageY,
+                        possibleIntersection.Y + possibleIntersection.Height, imageY + imageHeight);
 
                     actions.Add(CapturedFillUpSpace(
                             possibleIntersection,
@@ -448,7 +454,7 @@ namespace spritedotless.BinPacker
                 // if something is anchored right then this expression will be false, but there will be no
                 // inserted empty space
             {
-                if ((positionType & (PositionType.Left | PositionType.Horizontal)) == 0 && mode == BinPackingMode.Horizontal && !isSecondary)
+                if ((positionType & (PositionType.Left | PositionType.Horizontal)) == 0 && (mode == BinPackingMode.Horizontal || (positionType & PositionType.Right) > 0) && !isSecondary)
                 {
                     if (offsetX == 0)
                     {
@@ -487,7 +493,7 @@ namespace spritedotless.BinPacker
                 // if something is anchored bottom then this expression will be false, but there will be no
                 // inserted empty space
             {
-                if ((positionType & (PositionType.Top | PositionType.Vertical)) == 0 && mode == BinPackingMode.Vertical && !isSecondary)
+                if ((positionType & (PositionType.Top | PositionType.Vertical)) == 0 && (mode == BinPackingMode.Vertical || (positionType & PositionType.Bottom) > 0) && !isSecondary)
                 {
                     if (offsetY == 0)
                     {
@@ -577,7 +583,7 @@ namespace spritedotless.BinPacker
                     (positionDecidedImage) => 
                         ((positionDecidedImage.SpriteImage.PositionType & PositionType.Right) > 0 ||
                         positionDecidedImage.Position.X >= moveIncreaseBoundaryX) &&
-                        positionDecidedImage.SpriteImage.PositionType != PositionType.Horizontal))
+                        (positionDecidedImage.SpriteImage.PositionType & (PositionType.Horizontal | PositionType.Left)) == 0))
                 {
                     if ((posSetter.SpriteImage.PositionType & PositionType.Right) > 0)
                     {
@@ -621,8 +627,8 @@ namespace spritedotless.BinPacker
                 // purposefully excludes horizontal and vertical positioned sprites
                 foreach (PositionSetter posSetter in positionDecidedImages.Where(
                     (positionDecidedImage) => ((positionDecidedImage.SpriteImage.PositionType & PositionType.Bottom) > 0 ||
-                        positionDecidedImage.Position.Y >= moveIncreaseBoundaryY) 
-                        && positionDecidedImage.SpriteImage.PositionType != PositionType.Vertical))
+                        positionDecidedImage.Position.Y >= moveIncreaseBoundaryY)
+                        && (positionDecidedImage.SpriteImage.PositionType & (PositionType.Vertical | PositionType.Top)) == 0))
                 {
                     if ((posSetter.SpriteImage.PositionType & PositionType.Bottom) > 0)
                     {
