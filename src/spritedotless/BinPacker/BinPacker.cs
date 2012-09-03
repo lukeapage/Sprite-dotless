@@ -229,6 +229,12 @@ namespace spritedotless.BinPacker
                 if (lastSpace == null)
                 {
                     Logger.Log("Unable to find space");
+                    Logger.Indent();
+                    for (int i = 0; i < emptySpaces.Count; i++)
+                    {
+                        Logger.Log("{0} - Position {1}x{2} Size {3}x{4}", emptySpaces[i].EmptySpaceNo, emptySpaces[i].X, emptySpaces[i].Y, emptySpaces[i].Width, emptySpaces[i].Height);
+                    }
+                    Logger.UnIndent();
 #if DEBUG
                     throw new Exception("Unable to find space");
 #else

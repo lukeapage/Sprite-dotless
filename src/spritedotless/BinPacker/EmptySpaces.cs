@@ -441,8 +441,8 @@ namespace spritedotless.BinPacker
 
             int excessWidth = emptySpace.Width - (imageWidth + offsetX),
                 excessHeight = emptySpace.Height - (imageHeight + offsetY);
-
-            if (excessWidth > 0 || (mode == BinPackingMode.Horizontal && !isSecondary))
+                                                                                         // or !Anywhere?
+            if (excessWidth > 0 || (mode == BinPackingMode.Horizontal && !isSecondary) || (positionType & (PositionType.Bottom | PositionType.Top | PositionType.Vertical)) > 0)
                 //&& (emptySpace.X + emptySpace.Width == this.Width)))
                 // We did attempt to only add space if there wasn't one already, the trouble is that
                 // if something is anchored right then this expression will be false, but there will be no
@@ -480,8 +480,8 @@ namespace spritedotless.BinPacker
                     Add(newSpace);
                 }
             }
-
-            if (excessHeight > 0 || (mode == BinPackingMode.Vertical && !isSecondary))
+            //                                                                            !anywhere?
+            if (excessHeight > 0 || (mode == BinPackingMode.Vertical && !isSecondary) || (positionType & (PositionType.Left | PositionType.Right | PositionType.Horizontal)) > 0)
                 // && (emptySpace.Y + emptySpace.Height == this.Height)))
                 // We did attempt to only add space if there wasn't one already, the trouble is that
                 // if something is anchored bottom then this expression will be false, but there will be no
